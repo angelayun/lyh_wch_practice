@@ -1,0 +1,6 @@
+node_modules
+
+src/.umi/*
+src/.umi/exports.ts
+src/.umi/testBrowser.tsx
+src/.umi/core/historyIntelli.ts
