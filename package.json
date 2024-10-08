@@ -9,6 +9,7 @@
     "start": "npm run dev"
   },
   "dependencies": {
+    "@datastructures-js/priority-queue": "^6.3.1",
     "umi": "^4.3.24"
   },
   "devDependencies": {

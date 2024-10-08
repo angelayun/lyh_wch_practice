@@ -7,7 +7,7 @@
  */
 var countGoodStrings = function (low, high, zero, one) {
   const MOD = 10 ** 9 + 7
-  let memo = new Array(high + 1).fill(-1)
+  /* let memo = new Array(high + 1).fill(-1)
   const dfs = (i) => {
     if (i <= 0) return 1
     if (memo[i] != -1) return memo[i]
@@ -21,9 +21,9 @@ var countGoodStrings = function (low, high, zero, one) {
     res += dfs(i) % MOD
     res %= MOD
   }
-  return res
-  // 上面不知道为什么取模通不过
-  /* let dp = new Array(high + 1).fill(0)
+  return res */
+  // 下面不知道为什么取模通不过
+  let dp = new Array(high + 1).fill(0)
   dp[0] = 1
   let res = 0
   for (let i = 1; i <= high; i++) {
@@ -34,5 +34,5 @@ var countGoodStrings = function (low, high, zero, one) {
       res %= MOD
     }
   }
-  return res */
+  return res
 };

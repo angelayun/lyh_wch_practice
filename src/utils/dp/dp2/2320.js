@@ -18,10 +18,17 @@ var countHousePlacements = function (n) {
     dp[i] = dp[i - 1] % MOD + dp[i - 2] % MOD
   }
   return Number(dp[n + 1] % MOD * dp[n + 1] % MOD) */
-  let f0 = 1n, f1 = 1n
+  /* let f0 = 1n, f1 = 1n
   for (let i = 2; i < n + 2; i++) {
-    let newF = f1 % MOD + f0 % MOD
-    f1 = f0
+    let newF = (f1 % MOD + f0 % MOD)
+    f0 = f1
+    f1 = newF
+  }
+  return Number((f1 % MOD) * (f1 % MOD) % MOD) */
+  let f0 = 1n, f1 = 1n
+  for (let i = 0; i < n ; i++) {
+    let newF = (f1 % MOD + f0 % MOD)
+    f0 = f1
     f1 = newF
   }
   return Number((f1 % MOD) * (f1 % MOD) % MOD)
