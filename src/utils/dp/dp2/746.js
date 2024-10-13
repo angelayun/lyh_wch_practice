@@ -3,6 +3,8 @@
  * @return {number}
  */
 var minCostClimbingStairs = function (cost) {
+  //题意是可以从倒数第1个或者倒数第2个上来  然后从当前上去就需要付cost[i]  求的是到n
+  // 边界 到0和1的花费为0
   const n = cost.length
   /* let memo = new Array(n + 1).fill(-1)
   const dfs = (i) => {
@@ -35,6 +37,7 @@ var minCostClimbingStairs = function (cost) {
     f1 = newF
   }
   return f1 */
+  // 这里事实上是偏移了一位  跟上面一种做法没啥区别
   let f0 = 0, f1 = 0
   for (let i = 1; i < n; i++) {
     let newF = Math.min(

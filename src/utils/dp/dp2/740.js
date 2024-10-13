@@ -8,6 +8,7 @@ var deleteAndEarn = function (nums) {
   for (let x of nums) {
     bucket[x]++
   }
+  // TODO 我这里的初始值是不是可以不赋值
   /* let dp = new Array(MX + 1).fill(0)
   dp[1] = bucket[1]
   for (let i = 1; i <= MX; i++) {

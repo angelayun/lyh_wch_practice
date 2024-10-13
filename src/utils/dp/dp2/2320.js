@@ -4,6 +4,7 @@
  */
 var countHousePlacements = function (n) {
   const MOD = BigInt(10 ** 9 + 7)
+  // 当前位置放就相当于dfs(i-2) 当前位置不放就相当于dfs(i-1)
   /* const memo = new Array(n + 1).fill(-1n)
   const dfs = (i) => {
     if (i <= 0) return 1n

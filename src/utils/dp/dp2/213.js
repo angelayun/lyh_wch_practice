@@ -17,9 +17,9 @@ var rob = function (nums) {
   const n = nums.length
 
   return Math.max(
-    // 第一个抢，只能抢 [2,n-2]
+    // 第0个抢，只能抢 [2,n-2]
     innerRob(nums.slice(2, n - 1)) + nums[0],
-    // 第一个不抢，只能抱[1,n-1]
+    // 第0个不抢，只能抱[1,n-1]
     innerRob(nums.slice(1))
   )
 };
