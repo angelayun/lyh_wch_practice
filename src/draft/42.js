@@ -33,3 +33,24 @@ var trap = function (height) {
   }
   return ans
 };
+
+/**
+ * @param {number[]} height
+ * @return {number}
+ */
+var trap = function (height) {
+  const n = height.length
+  let stack = []
+  let ans = 0
+  for (let i = 0; i < n; i++) {
+    while (stack.length && height[i] >= height[stack[stack.length - 1]]) {
+      let bottomH = height[stack.pop()]
+      if (stack.length == 0) break
+      let left = stack[stack.length - 1]
+      let h = Math.min(height[i], height[left]) - bottomH
+      ans += h * (i - left + 1)
+    }
+    stack.push(i)
+  }
+  return ans
+};

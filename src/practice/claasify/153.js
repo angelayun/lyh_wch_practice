@@ -41,3 +41,4 @@ var findMin = function (nums) {
   }
   return nums[left]
 };
+// 最后一个数  如果当前数比最后一个数小  要么是最小值  要么是最小值的右侧元素

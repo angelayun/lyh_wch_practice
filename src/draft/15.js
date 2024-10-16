@@ -18,8 +18,12 @@ var threeSum = function (nums) {
       let sum = nums[left] + nums[right] + x
       if (sum > 0) {
         right--
+        while (left < right && nums[right] == nums[right + 1]) right--
+
       } else if (sum < 0) {
         left++
+        while (left < right && nums[left] == nums[left - 1]) left++
+
       } else {
         res.push([x, nums[left], nums[right]])
         left++
