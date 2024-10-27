@@ -27,6 +27,8 @@ var minimumCoins = function (prices) {
  */
 var minimumCoins = function (prices) {
   const n = prices.length
+  // i*2==n-1   i= ~~((n-1)/2)
+  // i*2=~~((n-1)/2)
   for (let i = ~~((n + 1) / 2) - 1; i > 0; i--) {
     let mn = Number.MAX_SAFE_INTEGER
     for (let j = i; j <= i * 2; j++) {
@@ -38,7 +40,7 @@ var minimumCoins = function (prices) {
 };
 
 
-
+// TODO 这个感觉还是不是那么理解
 /**
  * @param {number[]} prices
  * @return {number}

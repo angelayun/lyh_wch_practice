@@ -12,12 +12,11 @@ var shortestSubarray = function (nums, k) {
     sum[i + 1] = sum[i] + BigInt(nums[i])
   }
   let queue = []
-  // 这里是<=n
   for (let i = 0; i <= n; i++) {
     let curS = sum[i]
     // curS是右边的前缀和  sum[queue[0]]是左边的前缀和  如果已经满足  那就已经不能找到一个更短的  就可以弹出了
     while (queue.length && curS - sum[queue[0]] >= k) {
-      ans = Math.min(ans, i - queue.shift()) // 这里还没有包含i进来  sum[i+1]才包含了nums[i]
+      ans = Math.min(ans, i - queue.shift())
     }
     // 当前前缀和比栈顶的要小  如果后续有数字x能各栈顶组成满足条件的子数组也一定能和curS组成满足条件的
     while (queue.length && sum[queue[queue.length - 1]] >= curS) {
