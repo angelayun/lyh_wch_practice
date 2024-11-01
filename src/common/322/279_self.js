@@ -4,6 +4,7 @@
 // 题目说明了1 <= n <= 10^4
 const memo = Array.from({ length: 101 }, () => new Array(10001).fill(-1));
 const dfs = (i, j) => {
+  // 这里是指前i 而不是第i  所以这里是  没有数可以选了，且要得到的数等于 0
   if (i == 0) {
     return j == 0 ? 0 : Infinity;
   }
