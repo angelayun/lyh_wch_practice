@@ -11,24 +11,22 @@
  * @return {number}
  */
 var sumNumbers = function (root) {
-  let ans = 0
+  let ans = 0;
   const dfs = (root, num) => {
-    if (root == null) return
-    num *= 10
-    num += root.val
+    if (root == null) return;
+    num *= 10;
+    num += root.val;
     if (root.left == root.right) {
-      ans += num
+      ans += num;
       // 这里最好写个return
-      return
+      return;
     }
-    dfs(root.left, num)
-    dfs(root.right, num)
-  }
-  dfs(root, 0)
-  return ans
+    dfs(root.left, num);
+    dfs(root.right, num);
+  };
+  dfs(root, 0);
+  return ans;
 };
-
-
 
 /**
  * Definition for a binary tree node.
@@ -42,13 +40,14 @@ var sumNumbers = function (root) {
  * @param {TreeNode} root
  * @return {number}
  */
-var sumNumbers = function (root, x) {
-  // 这里是返回0
-  if (root == null) return 0
-  x *= 10
-  x += root.val
-  if (root.left == root.right) {
+var sumNumbers = function (root, x = 0) {
+  if (root === null) {
+    return 0;
+  }
+  x = x * 10 + root.val;
+  if (root.left === root.right) {
+    // root 是叶子节点
     return x;
   }
-  return sumNumbers(root.left, x) + sumNumbers(root.right, x)
+  return sumNumbers(root.left, x) + sumNumbers(root.right, x);
 };

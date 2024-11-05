@@ -14,7 +14,6 @@
  */
 var getDirections = function (root, startValue, destValue) {
   let path = [];
-  // 这个dfs必须是要有返回值的
   const dfs = (root, target) => {
     if (root == null) return false;
     if (root.val == target) return true;
@@ -42,6 +41,7 @@ var getDirections = function (root, startValue, destValue) {
   ) {
     k++;
   }
-  // 前k个都不要了 只要后面部分 左子树的后面部分都是向上  右子树的后面部分是L就是L 是R就是R
   return 'U'.repeat(pathStart.length - k) + pathDest.slice(k).join('');
 };
+
+// 
