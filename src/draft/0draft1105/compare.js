@@ -1,32 +1,31 @@
+const MOD = BigInt(10 ** 9 + 7);
+const MX = 10 ** 5 + 1;
+let f = new Array(MX).fill(0n);
+let g = new Array(MX).fill(0n);
+f[0] = g[0] = 1n;
+f[1] = g[1] = 1n;
+f[2] = g[2] = 2n;
+f[3] = g[3] = 4n;
+for (let i = 4; i < MX; i++) {
+  f[i] = (f[i - 1] + f[i - 2] + f[i - 3]) % MOD;
+  g[i] = (g[i - 1] + g[i - 2] + g[i - 3] + g[i - 4]) % MOD;
+}
 /**
- * @param {number[][]} edges1
- * @param {number[][]} edges2
+ * @param {string} pressedKeys
  * @return {number}
  */
-var minimumDiameterAfterMerge = function (edges1, edges2) {
-  const diameter = (edges) => {
-    const n = edges.length;
-    const graph = Array.from({ length: n + 1 }, () => new Array());
-    console.log(edges);
-    for (let [x, y] of edges) {
-      graph[x].push(y);
-      graph[y].push(x);
+var countTexts = function (pressedKeys) {
+  let count = 0;
+  let res = 1n;
+  for (let i = 0; i < pressedKeys.length; i++) {
+    count++;
+    if (i == pressedKeys.length - 1 || pressedKeys[i + 1] != pressedKeys[i]) {
+      // 到了分界点了
+      let c = pressedKeys[i];
+      res *= (c == '7' || c == '9' ? g[count] : f[count]) % MOD;
+      res %= MOD;
+      count = 0;
     }
-    let ans = 0;
-    const dfs = (x, fa) => {
-      let maxLen = 0;
-      for (let y of graph[x]) {
-        if (y == fa) continue;
-        let subLen = diameter(y, x) + 1;
-        ans = Math.max(ans, maxLen + subLen);
-        maxLen = Math.max(maxLen, subLen);
-      }
-      return maxLen;
-    };
-    dfs(0, -1);
-    return ans;
-  };
-  let d1 = diameter(edges1);
-  let d2 = diameter(edges2);
-  return Math.max(d1, d2, ((d1 + 1) >> 1) + ((d2 + 1) >> 1) + 1);
+  }
+  return Number(res % MOD);
 };

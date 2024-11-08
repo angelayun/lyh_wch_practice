@@ -50,7 +50,10 @@ var lengthOfLongestSubsequence = function (nums, target) {
   let ans = f[n][target];
   return ans > -1 ? ans : -1;
 };
-
+/*   
+  c
+i i+1  
+*/
 /**
  * @param {number[]} nums
  * @param {number} target
