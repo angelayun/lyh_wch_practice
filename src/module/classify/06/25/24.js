@@ -2,7 +2,8 @@ var swapPairs = function (head) {
   let dummy = new ListNode(0, head); // 用哨兵节点简化代码逻辑
   let node0 = dummy;
   let node1 = head;
-  while (node1 && node1.next) { // 至少有两个节点
+  while (node1 && node1.next) {
+    // 至少有两个节点
     let node2 = node1.next;
     let node3 = node2.next;
 

@@ -11,6 +11,7 @@
  * @return {boolean}
  */
 var isUnivalTree = function (root) {
+  // 灵神没有解法   我自己写的  好像也挺妙的
   if (root == null) return true;
   if (root.left && root.left.val != root.val) return false;
   if (root.right && root.right.val != root.val) return false;
