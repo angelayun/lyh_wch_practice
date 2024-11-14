@@ -17,3 +17,14 @@ var isUnivalTree = function (root) {
   if (root.right && root.right.val != root.val) return false;
   return isUnivalTree(root.left) && isUnivalTree(root.right);
 };
+/**
+ * @param {TreeNode} root
+ * @return {boolean}
+ */
+var isUnivalTree = function (root, parentNodeVal) {
+  if (root == null) return true;
+  if (parentNodeVal != null && root.val != parentNodeVal) return false;
+  return (
+    isUnivalTree(root.left, root.val) && isUnivalTree(root.right, root.val)
+  );
+};

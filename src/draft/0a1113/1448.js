@@ -10,20 +10,10 @@
  * @param {TreeNode} root
  * @return {number}
  */
-var goodNodes = function (root, maxVal = Number.MIN_SAFE_INTEGER) {
-  if (root == null) return 0;
-  let curMax = Math.max(maxVal, root.val);
-  let leftCount = goodNodes(root.left, curMax);
-  let rightCount = goodNodes(root.right, curMax);
-  return leftCount + rightCount + (root.val >= maxVal);
-};
-
-var goodNodes = function (root, maxVal = Number.MIN_SAFE_INTEGER) {
+var goodNodes = function (root, maxVal = -Infinity) {
   if (root == null) return 0;
   let curMax = Math.max(root.val, maxVal);
   let leftCount = goodNodes(root.left, curMax);
   let rightCount = goodNodes(root.right, curMax);
-  // let leftCount = goodNodes(root.left, Math.max(root.val, maxVal));
-  // let rightCount = goodNodes(root.right, Math.max(root.val, maxVal));
   return leftCount + rightCount + (root.val >= maxVal);
 };

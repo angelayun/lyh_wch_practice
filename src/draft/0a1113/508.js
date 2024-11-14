@@ -11,21 +11,19 @@
  * @return {number[]}
  */
 var findFrequentTreeSum = function (root) {
-  // key是子树和  value为出现的次数
   let cnt = new Map();
-  const dfs = (root, sum) => {
-    if (root == null) return sum;
-    let leftSum = dfs(root.left, sum);
-    let rightSum = dfs(root.right, sum);
-    let res = leftSum + rightSum + root.val;
+  const dfs = (root) => {
+    if (root == null) return 0;
+    let leftSum = dfs(root.left);
+    let rightSum = dfs(root.right);
+    let res = root.val + leftSum + rightSum;
     cnt.set(res, (cnt.get(res) || 0) + 1);
     return res;
   };
-
   dfs(root, 0);
   let maxVal = Math.max(...cnt.values());
   let res = [];
-  for (let [key, val] of cnt.entries()) {
+  for (let [key, val] of cnt) {
     if (val == maxVal) {
       res.push(key);
     }
