@@ -14,21 +14,23 @@
 var pathSum = function (root, targetSum) {
   let ans = [];
   let path = [];
-  const dfs = (root, sum) => {
+  const dfs = (root, target) => {
     if (root == null) return;
-    sum += root.val;
+    target -= root.val;
     path.push(root.val);
     if (root.left == root.right) {
-      if (targetSum == sum) {
+      if (targetSum == 0) {
         ans.push(path.slice());
       }
       path.pop();
       return;
     }
-    dfs(root.left, sum);
-    dfs(root.right, sum);
+    dfs(root.left, target);
+
+    dfs(root.right, target);
     path.pop();
   };
-  dfs(root, 0);
+  dfs(root, targetSum);
   return ans;
 };
+// 待验证
