@@ -9,16 +9,20 @@ import yayJpg from '../assets/yay.jpg';
 // import sumOfGoodSubsequences from '@/draft/0aa1116/3351'
 // import findXSum from '@/weekly/3318'
 // import subsequencePairCount from '@/draft/0aa1119/3336';
-import shortestDistanceAfterQueries from '@/draft/0aa1119/3344';
+// import shortestDistanceAfterQueries from '@/draft/0aa1119/3344';
+import finalPositionOfSnake from '@/draft/0aa1119/3248';
 export default function HomePage() {
-  console.log(
+  // console.log(finalPositionOfSnake(3, ['DOWN', 'RIGHT', 'UP']));
+  console.log(finalPositionOfSnake(2, ['RIGHT', 'DOWN']));
+
+  /* console.log(
     shortestDistanceAfterQueries(5, [
       [2, 4],
       [0, 2],
       [0, 4],
     ])
-  );
-  console.log('没有到这里么')
+  ); */
+  console.log('没有到这里么');
   // console.log(findXSum([1,1,2,2,3,4,2,3],6,2))
   // console.log(subsequencePairCount([1, 2, 3, 4]));
   // hasIncreasingSubarrays([-3, -19, -8, -16], 2);
