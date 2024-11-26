@@ -12,12 +12,19 @@
  */
 var maxProduct = function (root) {
   const MOD = Math.pow(10, 9) + 7;
+  let ans = Number.MIN_SAFE_INTEGER;
+  let totalSum = null;
   const dfsSum = (root) => {
     if (root == null) return 0;
-    let leftSum = dfsSum(root.left);
-    let rightSum = dfsSum(root.right);
-    return leftSum + rightSum + root.va;
+    let leftSum = dfsSum(root.left) % MOD;
+    let rightSum = dfsSum(root.right) % MOD;
+    if (totalSum != null) {
+      ans = Math.max(ans, totalSum / leftSum, totalSum / rightSum);
+    }
+    return (leftSum + rightSum + root.val) % MOD;
   };
-  let totalSum = dfsSum(root);
-  
+  totalSum = dfsSum(root);
+  dfsSum(root);
+
+  return ans;
 };
