@@ -5,8 +5,8 @@ var solveNQueens = function (n) {
   // 是否已经选中这一列了
   const onPath = Array(n).fill(false);
   // 左右斜对角线
-  const diag1 = Array(n * 2 - 1).fill(false);
-  const diag2 = Array(n * 2 - 1).fill(false);
+  const diag1 = Array(n * 2).fill(false);
+  const diag2 = Array(n * 2).fill(false);
   function dfs(r) {
     if (r === n) {
       ans.push(col.map(c => '.'.repeat(c) + 'Q' + '.'.repeat(n - 1 - c)));

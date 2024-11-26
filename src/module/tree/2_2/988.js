@@ -14,15 +14,18 @@ var smallestFromLeaf = function (root) {
   let ans = '';
   const dfs = (root, path) => {
     if (root == null) {
-      path = path.split('').reverse().join('');
-      if (ans < path) ans = path;
-      console.log(path)
       return;
     }
-    path += String.fromCharCode(0 + 97);
+    path += String.fromCharCode(root.val + 97);
+    if (root.left == root.right) {
+      path = path.split('').reverse().join('');
+      if (ans == '' || ans > path) ans = path;
+      // console.log(path);
+      return;
+    }
     dfs(root.left, path);
     dfs(root.right, path);
   };
-  dfs(root, root.val);
+  dfs(root, '');
   return ans;
 };
