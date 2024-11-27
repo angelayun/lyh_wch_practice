@@ -15,25 +15,16 @@ var countPairs = function (root, distance) {
   let ans = 0;
   const dfs = (root) => {
     if (root == null) return [];
-    if (root.left == root.right) return [0];
-    let res = [];
+    if (root.left == root.right) return [1];
     let left = dfs(root.left);
-    for (let x of left) {
-      if (x > distance) continue;
-      res.push(x);
-    }
     let right = dfs(root.right);
-    for (let x of right) {
-      if (x > distance) continue;
-      res.push(x);
-    }
     for (let l of left) {
       for (let r of right) {
-        ans += l + r <= distance;
+        if (l + r < distance) ans++;
       }
     }
-    return res;
+    return [...left, ...right].map((item) => item + 1);
   };
-  dfs(root);
+  dfs(root)
   return ans;
 };
