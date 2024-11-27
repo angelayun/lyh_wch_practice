@@ -11,20 +11,24 @@
  * @return {number}
  */
 var maxProduct = function (root) {
-  const MOD = Math.pow(10, 9) + 7;
-  let ans = Number.MIN_SAFE_INTEGER;
-  let totalSum = null;
-  const dfsSum = (root) => {
-    if (root == null) return 0;
-    let leftSum = dfsSum(root.left) % MOD;
-    let rightSum = dfsSum(root.right) % MOD;
-    if (totalSum != null) {
-      ans = Math.max(ans, totalSum / leftSum, totalSum / rightSum);
-    }
-    return (leftSum + rightSum + root.val) % MOD;
+  const mod = 1000000007;
+  // 求当前这颗树的和
+  const sum = (node) => {
+    if (!node) return 0;
+    return sum(node.right) + sum(node.left) + node.val;
   };
-  totalSum = dfsSum(root);
-  dfsSum(root);
-
-  return ans;
+  const totalSum = sum(root) % mod;
+  let max = 0;
+  // 这个dfs也是求当前这颗树的和
+  const maxSum = (node) => {
+    if (!node) return 0;
+    const left = maxSum(node.left);
+    const right = maxSum(node.right);
+    // 同时记录最大值
+    max = Math.max(left * (totalSum - left), right * (totalSum - right), max);
+    return left + right + node.val;
+  };
+  maxSum(root, 0);
+  return max % mod;
 };
+// 这是之前写的题解

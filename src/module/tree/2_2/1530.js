@@ -12,26 +12,28 @@
  * @return {number}
  */
 var countPairs = function (root, distance) {
-  let pairs = 0;
-  const getDistances = (node) => {
-    let res = new Array();
-    if (node == null) return res;
-    if (node.left == node.right) {
-      res.push(0);
-      return res;
+  let ans = 0;
+  const dfs = (root) => {
+    if (root == null) return [];
+    if (root.left == root.right) return [0];
+    let res = [];
+    let left = dfs(root.left);
+    for (let x of left) {
+      if (x > distance) continue;
+      res.push(x);
     }
-    let leftRes = getDistances(node.left);
-    let rightRes = getDistances(node.right);
-    let leftSize = leftRes.length;
-    let rightSize = rightRes.length;
-    for (let i = 0; i < leftSize; i++) {
-      let leftDist = leftRes[i] + 1;
-      leftRes[i] = leftDist;
-      if (leftDist <= distance) {
-        res.push(leftDist);
+    let right = dfs(root.right);
+    for (let x of right) {
+      if (x > distance) continue;
+      res.push(x);
+    }
+    for (let l of left) {
+      for (let r of right) {
+        ans += l + r <= distance;
       }
     }
+    return res;
   };
-  return pairs;
+  dfs(root);
+  return ans;
 };
-// TODO 待做

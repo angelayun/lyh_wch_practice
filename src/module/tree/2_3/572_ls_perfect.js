@@ -1,11 +1,3 @@
-/**
- * Definition for a binary tree node.
- * function TreeNode(val, left, right) {
- *     this.val = (val===undefined ? 0 : val)
- *     this.left = (left===undefined ? null : left)
- *     this.right = (right===undefined ? null : right)
- * }
- */
 const getHeight = (root) => {
   if (root == null) return 0;
   let leftHeight = getHeight(root.left);
@@ -28,8 +20,8 @@ var isSubtree = function (root, subRoot) {
   let hs = getHeight(subRoot);
   const dfs = (node) => {
     if (node == null) return [0, false];
-    let [leftHeight, leftFound] = dfs(root.left);
-    let [rightHeight, rightFound] = dfs(root.right);
+    let [leftHeight, leftFound] = dfs(node.left);
+    let [rightHeight, rightFound] = dfs(node.right);
     if (leftFound || rightFound) {
       return [0, true];
     }
@@ -38,4 +30,4 @@ var isSubtree = function (root, subRoot) {
   };
   return dfs(root)[1];
 };
-// TODO 没太搞明白这个为什么会报栈溢出
+// 灵神的优化写法，很棒，思路很清晰
