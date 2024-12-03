@@ -16,19 +16,26 @@ var getDirections = function (root, startValue, destValue) {
   let path = [];
   const dfs = (root, target) => {
     if (root == null) return false;
+    if (root.val == target) return true;
     path.push('L');
     if (dfs(root.left, target)) return true;
     path.pop();
     path.push('R');
     if (dfs(root.right, target)) return true;
     path.pop();
+    return false;
   };
   dfs(root, startValue);
   let startPath = path.slice();
+  path = [];
   dfs(root, destValue);
   let destPath = path.slice();
   let k = 0;
-  while (k < startPath.length && k < destPath && startPath[k] == destPath[k]) {
+  while (
+    k < startPath.length &&
+    k < destPath.length &&
+    startPath[k] == destPath[k]
+  ) {
     k++;
   }
   return 'U'.repeat(startPath.length - k) + destPath.slice(k).join('');

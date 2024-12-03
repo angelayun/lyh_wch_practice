@@ -1,17 +1,3 @@
-/**
- * Definition for a binary tree node.
- * function TreeNode(val, left, right) {
- *     this.val = (val===undefined ? 0 : val)
- *     this.left = (left===undefined ? null : left)
- *     this.right = (right===undefined ? null : right)
- * }
- */
-/**
- * @param {TreeNode} root
- * @param {number} startValue
- * @param {number} destValue
- * @return {string}
- */
 var getDirections = function (root, startValue, destValue) {
   let path = [];
   const dfs = (root, target) => {
@@ -40,5 +26,5 @@ var getDirections = function (root, startValue, destValue) {
     k < destPath.length && k < startPath.length && destPath[k] == startPath[k];
     k++
   );
-  return 'U'.repeat(startPath.length - k) + destPath.join('');
+  return 'U'.repeat(startPath.length - k) + destPath.slice(k).join('');
 };
