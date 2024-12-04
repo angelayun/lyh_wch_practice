@@ -10,10 +10,12 @@ import yayJpg from '../assets/yay.jpg';
 // import findXSum from '@/weekly/3318'
 // import subsequencePairCount from '@/draft/0aa1119/3336';
 // import shortestDistanceAfterQueries from '@/draft/0aa1119/3344';
-import finalPositionOfSnake from '@/draft/0aa1119/3248';
+// import finalPositionOfSnake from '@/draft/0aa1119/3248';
+// import recoverFromPreorder from '@/module/tree/2_10/1028.js'
 export default function HomePage() {
   // console.log(finalPositionOfSnake(3, ['DOWN', 'RIGHT', 'UP']));
-  console.log(finalPositionOfSnake(2, ['RIGHT', 'DOWN']));
+  // console.log(finalPositionOfSnake(2, ['RIGHT', 'DOWN']));
+  // console.log(recoverFromPreorder("1-2--3--4-5--6--7"))
 
   /* console.log(
     shortestDistanceAfterQueries(5, [

@@ -1,15 +1,14 @@
-/**
- * Definition for a binary tree node.
- * function TreeNode(val, left, right) {
- *     this.val = (val===undefined ? 0 : val)
- *     this.left = (left===undefined ? null : left)
- *     this.right = (right===undefined ? null : right)
- * }
- */
-/**
- * @param {TreeNode} root
- * @return {TreeNode}
- */
-var increasingBST = function(root) {
-    
+var increasingBST = function (root) {
+  let dummyNode = new TreeNode(-1);
+  let p = dummyNode;
+  const dfs = (root) => {
+    if (root == null) return;
+    dfs(root.left);
+    p.right = root;
+    p = p.right;
+    root.left = null
+    dfs(root.right);
+  };
+  dfs(root);
+  return dummyNode.right;
 };
