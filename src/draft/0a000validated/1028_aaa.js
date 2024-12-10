@@ -14,7 +14,7 @@ var recoverFromPreorder = function (traversal) {
   let map = new Map();
   map.set(-1, new TreeNode(-1));
   const addTree = (depth, v) => {
-    map.set(depth, new TreeNode(parseInt(v)));
+    map.set(depth, new TreeNode(v));
     let rootNode = map.get(depth - 1);
     if (rootNode.left == null) {
       rootNode.left = map.get(depth);

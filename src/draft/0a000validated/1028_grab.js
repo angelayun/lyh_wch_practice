@@ -11,30 +11,31 @@
  * @return {TreeNode}
  */
 var recoverFromPreorder = function (traversal) {
-  let map = new Map();
-  map.set(-1, new TreeNode(-1));
-  const addTree = (depth, v) => {
-    map.set(depth, new TreeNode(parseInt(v)));
-    let rootNode = map.get(depth - 1);
+  let ans = new Map();
+  ans.set(-1, new TreeNode(0));
+  const addTree = (v, p) => {
+    // p是层级  v是节点的值
+    ans.set(p, new TreeNode(parseInt(v)));
+    let rootNode = ans.get(p - 1);
     if (rootNode.left == null) {
-      rootNode.left = map.get(depth);
+      rootNode.left = ans.get(p);
     } else {
-      rootNode.right = map.get(depth);
+      rootNode.right = ans.get(p);
     }
   };
-  let depth = 0,
+  let dep = 0,
     val = '';
   for (let c of traversal) {
-    if (c != '#') {
+    if (c != '-') {
       val += c;
     } else if (val) {
-      addTree(depth, val);
+      addTree(val, dep);
+      dep = 1;
       val = '';
-      depth = 1;
     } else {
-      depth++;
+      dep++;
     }
   }
-  addTree(depth, val);
-  return map.get(0);
+  addTree(val, dep);
+  return ans.get(0);
 };
