@@ -15,9 +15,14 @@ const reverseList = (head) => {
  */
 var removeNodes = function (head) {
   head = reverseList(head);
-  let dummyNode = new ListNode(-1, head);
-  let p = dummyNode
-  while (p) {
-    
+  let p = head;
+  while (p && p.next) {
+    let next = p.next;
+    if (next.val < p.val) {
+      p.next = next.next;
+    } else {
+      p = p.next;
+    }
   }
+  return reverseList(head);
 };
