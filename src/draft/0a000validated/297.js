@@ -31,7 +31,7 @@ var deserialize = function (data) {
     if (!list.length) return null;
     let val = list[0];
     if (val == '#') return null;
-    return new TreeNode(val, build(), build());
+    return new TreeNode(parseInt(val), build(), build());
   };
   return build;
 };

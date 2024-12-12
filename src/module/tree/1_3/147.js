@@ -24,3 +24,4 @@ var insertionSortList = function (head) {
   }
   return dummyNode.next;
 };
+// 这个是完全暴力  没法看

@@ -12,7 +12,7 @@
  * @return {ListNode}
  */
 var reverseBetween = function (head, left, right) {
-  let dummnyNode = new ListNode(head);
+  let dummnyNode = new ListNode(-1,head);
   let p = dummnyNode;
   for (let i = 0; i < left - 1; i++) {
     p = p.next;
