@@ -12,8 +12,8 @@
  * @return {ListNode}
  */
 var reverseBetween = function (head, left, right) {
-  let dummnyNode = new ListNode(head);
-  let p = dummnyNode;
+  let dummyNode = new ListNode(head);
+  let p = dummyNode;
   for (let i = 0; i < left - 1; i++) {
     p = p.next;
   }
@@ -27,5 +27,5 @@ var reverseBetween = function (head, left, right) {
   }
   p.next.next = cur;
   p.next = prev;
-  return dummnyNode.next;
+  return dummyNode.next;
 };
