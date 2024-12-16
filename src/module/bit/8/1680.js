@@ -10,7 +10,7 @@ var concatenatedBinary = function (n) {
     if ((i & (i - 1n)) === 0n) shift++;
     ans = ((ans << shift) + i) % 1000000007n;
   }
-  return ans;
+  return Number(ans);
 };
 
 /* 人家写的很棒

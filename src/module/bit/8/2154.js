@@ -35,25 +35,6 @@ var findFinalValue = function (nums, original) {
  * @return {number}
  */
 var findFinalValue = function (nums, original) {
-  let cnt = new Map();
-  for (let i = original; i <= 1000; i += original) {
-    cnt.set(i, 1);
-  }
-  for (let x of nums) {
-    if (cnt.has(x)) cnt.set(x, 2);
-  }
-  while (cnt.get(original) == 2) {
-    original <<= 1;
-  }
-  return original;
-};
-
-/**
- * @param {number[]} nums
- * @param {number} original
- * @return {number}
- */
-var findFinalValue = function (nums, original) {
   let mask = 0;
   for (let x of nums) {
     if (x % original == 0) {
