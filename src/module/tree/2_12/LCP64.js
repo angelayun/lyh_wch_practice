@@ -22,21 +22,25 @@ var closeLampInTree = function (root) {
     if ((node.val == 1) == (switch2Stat == switch3Stat)) {
       //枚举打开一个开关 或者打开三个开关的情况
       let res1 =
+        // 按的开关1
         dfs(node.left, switch2Stat, false) +
         dfs(node.right, switch2Stat, false) +
         1;
 
       let res2 =
+        // 按的开关2
         dfs(node.left, !switch2Stat, false) +
         dfs(node.right, !switch2Stat, false) +
         1;
 
       let res3 =
+        // 按的开关3
         dfs(node.left, switch2Stat, true) +
         dfs(node.right, switch2Stat, true) +
         1;
 
       let res123 =
+        // 3个开关都开
         dfs(node.left, !switch2Stat, true) +
         dfs(node.right, !switch2Stat, true) +
         3;

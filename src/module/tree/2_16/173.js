@@ -26,6 +26,7 @@ var BSTIterator = function (root) {
  * @return {number}
  */
 BSTIterator.prototype.next = function () {
+  // 序列是从大到小的  那么出来的时候就是从小到大的
   let val = this.queue.pop();
   return val;
 };

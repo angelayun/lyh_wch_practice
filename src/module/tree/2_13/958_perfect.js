@@ -15,26 +15,25 @@ var isCompleteTree = function (root) {
   if (root != null) {
     queue.push(root);
   }
-  let ans = true;
   let end = false;
+  // 层序遍历  从左到右
   while (queue.length) {
     let size = queue.length;
     let nextQueue = [];
     for (let i = 0; i < size; i++) {
       let node = queue[i];
       if (node == null) {
+        // 出来了一个空节点  表示已经到结尾了
         end = true;
       } else {
         if (end) {
-          ans = false;
-          break;
+          return false;
         }
         nextQueue.push(node.left);
         nextQueue.push(node.right);
       }
     }
-    if (ans == false) return ans;
     queue = nextQueue;
   }
-  return ans;
+  return true;
 };

@@ -9,7 +9,7 @@ var singleNumber = function (nums) {
   let lowBit = xor & -xor;
   let res = [0, 0];
   for (let x of nums) {
-    res[(x & lowBit) ? 1 : 0] ^= x;
+    res[x & lowBit ? 1 : 0] ^= x;
   }
   return res;
 };
