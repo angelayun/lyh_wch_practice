@@ -1,12 +1,11 @@
 const getReverse = (label, row) => {
+  // 这一层的起始编号
   let start = 1 << (row - 1);
+  // 这一层的结束编号
   let end = (1 << row) - 1;
+  // 对应编号
   return start + end - label;
 };
-/* const getReverse = (label, row) => {
-  // row这一层最左边节点索引(1 << (row - 1))  最右边节点索引(1 << row) - 1)
-  return (1 << (row - 1)) + (1 << row) - 1 - label;
-}; */
 /**
  * @param {number} label
  * @return {number[]}
@@ -19,10 +18,10 @@ var pathInZigZagTree = function (label) {
     row++;
     rowStart <<= 1;
   }
+  // 统一都弄成正序的好找
   if (row % 2 == 0) {
     label = getReverse(label, row);
   }
-  console.log(rowStart, row, label);
   const path = [];
   while (row > 0) {
     if (row % 2 == 0) {

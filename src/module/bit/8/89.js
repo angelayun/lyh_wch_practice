@@ -15,8 +15,10 @@ var grayCode = function (n) {
     while (true) {
       // 当前这一位要变成的数字  1变成0  0变成1
       let changeVal = ((prev >> bit) & 1) ^ 1;
-      // 把当前这一位上的值去掉
-      cur = cur ^ (1 << bit);
+      // 把当前这一位上的值去掉  删除元素（一定在集合中）
+      // cur = cur ^ (1 << bit);
+      // 把当前这一位上的值去掉 （删除元素）
+      cur = cur & ~(1 << bit);
       cur |= changeVal << bit;
       if (!set.has(cur)) {
         set.add(cur);
