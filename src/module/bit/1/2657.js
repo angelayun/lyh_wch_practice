@@ -29,3 +29,4 @@ var findThePrefixCommonArray = function (A, B) {
   }
   return ans;
 };
+// 找到两个数组的前缀公共数组

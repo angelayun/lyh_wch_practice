@@ -18,3 +18,4 @@ var countTriplets = function (arr) {
   }
   return res;
 };
+// TODO 这个题目先暂时还不是特别理解  等做完前缀和的时候再来温习一遍这个

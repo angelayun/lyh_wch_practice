@@ -1,37 +1,23 @@
-/* const getReverse = (row, label) => {
-  let start = 1 << (row - 1);
-  let end = 1 << (row - 1);
-  return start + end - label;
-}; */
-const getReverse = (label, row) => {
-  // row这一层最左边节点索引(1 << (row - 1))  最右边节点索引(1 << row) - 1)
-  return (1 << (row - 1)) + (1 << row) - 1 - label;
-};
 /**
- * @param {number} label
- * @return {number[]}
+ * @param {number} a
+ * @param {number} b
+ * @param {number} c
+ * @return {number}
  */
-var pathInZigZagTree = function (label) {
-  let row = 1,
-    rowStart = 1;
-  // 下一行的起始位置比label小  放心的加
-  while (rowStart * 2 < label) {
-    row++;
-    rowStart >>= 1;
-  }
-  if (row % 2 == 0) {
-    label = getReverse(label);
-  }
-  const path = [];
-  while (row > 0) {
-    if (row % 2 == 0) {
-      path.push(getReverse(row, label));
+var minFlips = function (a, b, c) {
+  let res = 0;
+  while (a || b || c) {
+    let aBit = a & 1,
+      bBit = b & 1,
+      cBit = c & 1;
+    if (cBit == 1) {
+      if (aBit == bBit && aBit == 0) res += 2;
     } else {
-      path.push(label);
+      res += aBit + bBit;
     }
-    row--;
-    label >>= 1;
+    a >>= 1;
+    b >>= 1;
+    c >>= 1;
   }
-  path.reverse();
-  return path;
+  return res;
 };

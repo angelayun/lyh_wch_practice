@@ -16,17 +16,15 @@ var hammingWeight = function (n) {
  * @return {number}
  */
 var minimizeXor = function (num1, num2) {
-  // 为了让异或和尽量小，这些 1 应当从高位到低位匹配 num1中的 1；如果匹配完了还有多余的 1，那么就从低位到高位把 0 改成 1。
   let c1 = hammingWeight(num1);
   let c2 = hammingWeight(num2);
-  // 置位跟c2一样 异或值最小
   while (c2 > c1) {
-    // 把c1最低位的0变成1
+    // 多出来1  让放到num1的最低位的0上  这样异或和最小
     num1 |= num1 + 1;
     c2--;
   }
   while (c1 > c2) {
-    // 把c2最低位的1变成0
+    // 少了1  那就应该匹配高位的1  这样异或和最小  那低位的1匹配不了了 就只能去掉了
     num1 &= num1 - 1;
     c1--;
   }
