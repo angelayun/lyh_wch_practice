@@ -15,17 +15,15 @@ var perfectMenu = function (materials, cookbooks, attribute, limit) {
       }
       return;
     }
-    // 不选的情况
     dfs(i + 1, taste, endurance);
-    // 是否满足制作的条件
-    let isCanCook = true;
+    let canCook = true;
     for (let j = 0; j < materials.length; j++) {
-      if (cookbooks[i][j] < materials[j]) {
-        isCanCook = false;
+      if (materials[j] < cookbooks[i][j]) {
+        canCook = false;
         break;
       }
     }
-    if (isCanCook) {
+    if (canCook) {
       for (let j = 0; j < materials.length; j++) {
         materials[j] -= cookbooks[i][j];
       }

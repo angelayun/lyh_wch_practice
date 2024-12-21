@@ -20,7 +20,7 @@ var perfectMenu = function (materials, cookbooks, attribute, limit) {
     // 是否满足制作的条件
     let isCanCook = true;
     for (let j = 0; j < materials.length; j++) {
-      if (cookbooks[i][j] < materials[j]) {
+      if (materials[j] < cookbooks[i][j]) {
         isCanCook = false;
         break;
       }
