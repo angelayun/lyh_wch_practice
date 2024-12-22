@@ -2,7 +2,7 @@ const gcd = (a, b) => {
   while (b != 0) {
     [a, b] = [b, a % b];
   }
-  return a;
+  return b;
 };
 /**
  * @param {number[]} nums
@@ -14,7 +14,7 @@ var countBeautifulPairs = function (nums) {
   for (let x of nums) {
     let lastBit = x % 10;
     for (let y = 1; y < 10; y++) {
-      if (cnt[y] > 0 && gcd(y, lastBit) == 1) {
+      if (cnt[y] && gcd(cnt[y], lastBit) == 1) {
         res += cnt[y];
       }
     }
