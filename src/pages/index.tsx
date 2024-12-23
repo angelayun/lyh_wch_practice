@@ -12,6 +12,7 @@ import yayJpg from '../assets/yay.jpg';
 // import shortestDistanceAfterQueries from '@/draft/0aa1119/3344';
 // import finalPositionOfSnake from '@/draft/0aa1119/3248';
 // import recoverFromPreorder from '@/module/tree/2_10/1028.js'
+import productQueries from '@/module/dataStructure/1_1/2438';
 export default function HomePage() {
   // console.log(finalPositionOfSnake(3, ['DOWN', 'RIGHT', 'UP']));
   // console.log(finalPositionOfSnake(2, ['RIGHT', 'DOWN']));
@@ -25,6 +26,13 @@ export default function HomePage() {
     ])
   ); */
   console.log('没有到这里么');
+  console.log(
+    productQueries(15, [
+      [0, 1],
+      [2, 2],
+      [0, 3],
+    ])
+  );
   // console.log(findXSum([1,1,2,2,3,4,2,3],6,2))
   // console.log(subsequencePairCount([1, 2, 3, 4]));
   // hasIncreasingSubarrays([-3, -19, -8, -16], 2);
