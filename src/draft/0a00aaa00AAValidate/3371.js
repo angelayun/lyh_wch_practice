@@ -4,20 +4,20 @@
  */
 var getLargestOutlier = function (nums) {
   // x+2y=total
-  const cnt = new Map();
+  let cnt = new Map();
   let total = 0;
   for (let x of nums) {
-    cnt.set(x, (cnt.get(x) || 0) + 1);
     total += x;
+    cnt.set(x, (cnt.get(x) || 0) + 1);
   }
-  let ans = -Infinity;
+  let res = -Infinity;
   for (let y of nums) {
-    cnt.set(y, cnt.get(y) - 1);
+    cnt.set(y, (cnt.get(y) || 0) - 1);
     let x = total - 2 * y;
-    if (cnt.get(x) > 0) {
-      ans = Math.max(ans, x);
+    if (cnt.get(x)) {
+      res = Math.max(res, cnt.get(x));
     }
-    cnt.set(y, cnt.get(y) + 1);
+    cnt.set(y, (cnt.get(y) || 0) + 1);
   }
-  return ans;
+  return res;
 };
