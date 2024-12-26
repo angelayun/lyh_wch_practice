@@ -14,6 +14,7 @@ var networkDelayTime = function (times, n, k) {
         x = i;
       }
     }
+    // 只有所有的都访问过了  x才会等于-1
     if (x < 0) {
       return Math.max(...dis);
     }

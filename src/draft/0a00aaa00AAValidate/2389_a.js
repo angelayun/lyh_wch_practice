@@ -3,7 +3,7 @@ const lowerBound = (nums, target) => {
     right = nums.length - 1;
   while (left <= right) {
     let mid = left + ((right - left) >> 1);
-    if (nums[mid] <= target) {
+    if (nums[mid] >= target) {
       left = mid + 1;
     } else {
       right = mid - 1;
@@ -23,7 +23,6 @@ var answerQueries = function (nums, queries) {
   for (let i = 1; i < n; i++) {
     nums[i] += nums[i - 1];
   }
-  console.log(nums);
   let ans = [];
   for (let target of queries) {
     ans.push(lowerBound(nums, target));
