@@ -11,7 +11,7 @@ var shiftDistance = function (s, t, nextCost, previousCost) {
   let prePrevious = new Array(LEN * 2 + 1).fill(0);
   for (let i = 0; i < LEN * 2; i++) {
     preNext[i + 1] = preNext[i] + nextCost[i % LEN];
-    prePrevious[i + 1] = prePrevious[i] + previousCost[i % LEN];
+    prePrevious[i + 1] = prePrevious[i + 1] + previousCost[i % LEN];
   }
   let ans = 0;
   for (let i = 0; i < s.length; i++) {
