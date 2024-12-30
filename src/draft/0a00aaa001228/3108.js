@@ -11,10 +11,10 @@ var minimumCost = function (n, edges, query) {
     graph[y].push([x, w]);
   }
   let ids = new Array(n).fill(-1);
-  let andVal = [];
+  let andsVal = [];
   const dfs = (x) => {
     // 属于哪个联通分量  默认从0开始编号
-    ids[x] = andVal.length;
+    ids[x] = andsVal.length;
     let and = -1;
     for (let [y, w] of graph[x]) {
       and &= w;
@@ -26,7 +26,7 @@ var minimumCost = function (n, edges, query) {
   };
   for (let i = 0; i < n; i++) {
     if (ids[i] == -1) {
-      andVal.push(dfs(i));
+      andsVal.push(dfs(i));
     }
   }
   let ans = [];
@@ -34,7 +34,7 @@ var minimumCost = function (n, edges, query) {
     if (ids[x] != ids[y]) {
       ans.push(-1);
     } else {
-      ans.push(andVal[ids[x]]);
+      ans.push(andsVal[ids[x]]);
     }
   }
   return ans;
