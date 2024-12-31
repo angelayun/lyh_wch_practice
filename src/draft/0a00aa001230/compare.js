@@ -4,7 +4,7 @@
  * @return {TreeNode}
  */
 var sufficientSubset = function (root, limit) {
-  limit -= root.val;
+  limit -= root;
   if (root.left == root.right) {
     if (limit > 0) return null;
     return root;
