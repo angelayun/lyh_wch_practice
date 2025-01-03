@@ -1,31 +1,31 @@
 /**
- * @param {number[][]} tiles
- * @param {number} carpetLen
- * @return {number}
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
  */
-var maximumWhiteTiles = function (tiles, carpetLen) {
-  tiles.sort((a, b) => a[0] - b[0]);
-  let cover = 0;
-  const n = tiles.length;
-  let ans = 0;
-  for (let left = 0, right = 0; right < n; right++) {
-    let [tl, tr] = tiles[right];
-    // 先把右边毯子长度加上
-    cover += tr - tl + 1;
-    while (right > left && tr - carpetLen + 1 >= tiles[left][0]) {
-      // 缩短窗口 把左边毯子长度去掉
-      cover -= tiles[left][1] - tiles[left][0] + 1;
-      left++;
-    }
-    ans = Math.max(
-      ans,
-      cover -
-        Math.max(
-          // 最大的左端点的位置   之前已经加上的左边毯子的数量   减去多加的那部分
-          tr - carpetLen + 1 - tiles[left][0],
-          0
-        )
-    );
+/**
+ * @param {TreeNode} root
+ * @param {number[]} to_delete
+ * @return {TreeNode[]}
+ */
+var delNodes = function (root, to_delete) {
+  let deleteSet = new Set(to_delete);
+  let ans = [];
+  const dfs = (root) => {
+    if (root == null) return null;
+    root.left = dfs(root.left);
+    root.right = dfs(root.right);
+    if (!deleteSet.has(root.val)) return root;
+    ans.push(root.left);
+    ans.push(root.right);
+    return null;
+  };
+  let cur = dfs(root);
+  if (cur) {
+    ans.push(cur);
   }
   return ans;
 };

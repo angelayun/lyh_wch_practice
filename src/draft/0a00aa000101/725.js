@@ -23,6 +23,7 @@ var splitListToParts = function (head, k) {
   for (let i = 0, cur = head; i < k && cur; i++) {
     res[i] = cur;
     let size = itemCount + (i < reminder ? 1 : 0);
+    let j = 1;
     while (j < size) {
       j++;
       cur = cur.next;
