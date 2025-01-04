@@ -14,6 +14,7 @@ MyCalendar.prototype.book = function (startTime, endTime) {
       return false;
     }
   }
+  // 首先没有办法保证用户输入的数据都是按照左端点排好序的
   this.calendar.push([startTime, endTime]);
   return true;
 };

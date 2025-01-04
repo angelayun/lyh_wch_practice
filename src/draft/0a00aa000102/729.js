@@ -1,5 +1,5 @@
 var MyCalendar = function () {
-  this.list = [];
+  this.calendar = {};
 };
 
 /**
@@ -8,15 +8,14 @@ var MyCalendar = function () {
  * @return {boolean}
  */
 MyCalendar.prototype.book = function (startTime, endTime) {
-  for (let i = 0; i < this.list.length - 1; i++) {
-    let [left1, right1] = this.list[i];
-    let [left2, right2] = this.list[i];
-
-    if (startTime >= right1 && endTime < left2) {
-      this.list.splice(i + 1, 0, [startTime, endTime]);
-      return true;
+  for (let [start, end] of Object.keys(this.calendar)) {
+    // end > startTime 保证 [startTime, endTime)是在当前区间范围内的
+    if (start < endTime && end > startTime) {
+      return false;
     }
   }
+  this.calendar.push([startTime, endTime]);
+  return true;
 };
 
 /**
