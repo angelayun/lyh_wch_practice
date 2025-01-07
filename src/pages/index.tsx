@@ -13,7 +13,8 @@ import yayJpg from '../assets/yay.jpg';
 // import finalPositionOfSnake from '@/draft/0aa1119/3248';
 // import recoverFromPreorder from '@/module/tree/2_10/1028.js'
 // import productQueries from '@/module/dataStructure/1_1/2438';
-import minOperations from '@/common/accu/2835.pefect';
+// import minOperations from '@/common/accu/2835.pefect';
+import minSumSquareDiff from '@/common/weekly/toCommit/2333';
 export default function HomePage() {
   // console.log(finalPositionOfSnake(3, ['DOWN', 'RIGHT', 'UP']));
   // console.log(finalPositionOfSnake(2, ['RIGHT', 'DOWN']));
@@ -27,7 +28,8 @@ export default function HomePage() {
     ])
   ); */
   console.log('没有到这里么');
-  console.log(minOperations([1, 32, 1, 2], 12));
+  // console.log(minOperations([1, 32, 1, 2], 12));
+  console.log(minSumSquareDiff([3, 5, 4, 4], [1, 2, 1, 0], 2, 4));
   /* console.log(
     productQueries(15, [
       [0, 1],
