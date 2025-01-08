@@ -14,7 +14,9 @@ import yayJpg from '../assets/yay.jpg';
 // import recoverFromPreorder from '@/module/tree/2_10/1028.js'
 // import productQueries from '@/module/dataStructure/1_1/2438';
 // import minOperations from '@/common/accu/2835.pefect';
-import minSumSquareDiff from '@/common/weekly/toCommit/2333';
+// import minSumSquareDiff from '@/common/weekly/toCommit/2333';
+// import findAnswer from '@/common/weekly/420/3327';
+import continuousSubarrays from '@/module/sliderWindow/1_1/2762'
 export default function HomePage() {
   // console.log(finalPositionOfSnake(3, ['DOWN', 'RIGHT', 'UP']));
   // console.log(finalPositionOfSnake(2, ['RIGHT', 'DOWN']));
@@ -29,7 +31,9 @@ export default function HomePage() {
   ); */
   console.log('没有到这里么');
   // console.log(minOperations([1, 32, 1, 2], 12));
-  console.log(minSumSquareDiff([3, 5, 4, 4], [1, 2, 1, 0], 2, 4));
+  // console.log(minSumSquareDiff([3, 5, 4, 4], [1, 2, 1, 0], 2, 4));
+  // console.log(findAnswer([-1, 0, 0, 1, 1, 2], 'aababa'));
+  console.log(continuousSubarrays([5,4,2,4]))
   /* console.log(
     productQueries(15, [
       [0, 1],
