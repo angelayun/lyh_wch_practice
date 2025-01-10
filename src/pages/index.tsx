@@ -16,7 +16,11 @@ import yayJpg from '../assets/yay.jpg';
 // import minOperations from '@/common/accu/2835.pefect';
 // import minSumSquareDiff from '@/common/weekly/toCommit/2333';
 // import findAnswer from '@/common/weekly/420/3327';
-import continuousSubarrays from '@/module/sliderWindow/1_1/2762'
+// import continuousSubarrays from '@/module/sliderWindow/1_1/2762'
+// import maxSum from '@/module/sliderWindow/1_1/2841';
+// import decrypt from '@/module/sliderWindow/1_1/1652';
+// import getSubarrayBeauty from '@/module/sliderWindow/1_2/2653';
+import maxFreq from '@/module/sliderWindow/1_2/1297';
 export default function HomePage() {
   // console.log(finalPositionOfSnake(3, ['DOWN', 'RIGHT', 'UP']));
   // console.log(finalPositionOfSnake(2, ['RIGHT', 'DOWN']));
@@ -30,10 +34,18 @@ export default function HomePage() {
     ])
   ); */
   console.log('没有到这里么');
+  // console.log(maxFreq('aababcaab', 2, 3, 4));
+  console.log(maxFreq('aaaa', 1, 3, 3));
+
+  // console.log(getSubarrayBeauty([1, -1, -3, -2, 3], 3, 2));
+  // console.log(getSubarrayBeauty([-3, 1, 2, -3, 0, -3], 2, 1));
   // console.log(minOperations([1, 32, 1, 2], 12));
   // console.log(minSumSquareDiff([3, 5, 4, 4], [1, 2, 1, 0], 2, 4));
   // console.log(findAnswer([-1, 0, 0, 1, 1, 2], 'aababa'));
-  console.log(continuousSubarrays([5,4,2,4]))
+  // console.log(continuousSubarrays([5,4,2,4]))
+  // console.log(maxSum([2, 6, 7, 3, 1, 7], 3, 4));
+  // console.log(decrypt([5, 7, 1, 4], 3));
+
   /* console.log(
     productQueries(15, [
       [0, 1],
