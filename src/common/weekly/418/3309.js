@@ -3,14 +3,16 @@
  * @return {number}
  */
 var maxGoodNumber = function (nums) {
-  nums.sort((a, b) => {
-    let sA = a.toString(2);
-    let sB = b.toString(2);
-    for (let i = 0; i < sA.length && i < sB.length; i++) {
-      if (sA[i] == '1' && sB[i] == '0') return a - b;
-      if (sA[i] == '0' && sB[i] == '1') return b - a;
-    }
-    return sA.length > sB.length ? a - b : b - a;
+  let arr = [nums[0], nums[1], nums[2]];
+  arr.sort((a, b) => {
+    let lenA = 32 - Math.clz32(a);
+    let lenB = 32 - Math.clz32(b);
+    return ((b << lenA) | a) - ((a << lenB) | b);
   });
-  console.log(nums);
+  let ans = 0;
+  for (let x of arr) {
+    let lenX = 32 - Math.clz32(x);
+    ans = (ans << lenX) | x;
+  }
+  return ans;
 };
