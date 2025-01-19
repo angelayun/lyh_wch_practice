@@ -5,8 +5,10 @@
  */
 var maximumPoints = function (enemyEnergies, currentEnergy) {
   let min = Math.min(...enemyEnergies);
-  if (currentEnergy > min) {
+  if (currentEnergy >= min) {
     let total = enemyEnergies.reduce((pre, cur) => pre + cur);
-    // total-min
+    currentEnergy += total - min;
+    return Math.floor(currentEnergy / min);
   }
+  return 0;
 };
