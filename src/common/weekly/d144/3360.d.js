@@ -8,6 +8,5 @@ var canAliceWin = function (n) {
     n -= count;
     count--;
   }
-  // 轮次是不是奇数次
-  return (10 - count) % 2 > 0;
+  return (10 - count) & 1;
 };
