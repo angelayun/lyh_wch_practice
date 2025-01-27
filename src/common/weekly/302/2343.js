@@ -15,10 +15,9 @@ var smallestTrimmedNumbers = function (nums, queries) {
       let x = nums[i];
       list.push([x.substr(x.length - t), i]);
     }
-    list.sort((a, b) => a[0] - b[0]);
+    // 这里有大数溢出的情况
+    list.sort((a, b) => Number(BigInt(a[0]) - BigInt(b[0])));
     ans.push(list[k - 1][1]);
   }
   return ans;
 };
-export default smallestTrimmedNumbers;
-// 到时候看一下这个是否能过吧
