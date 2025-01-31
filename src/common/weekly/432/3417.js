@@ -3,17 +3,17 @@
  * @return {number[]}
  */
 var zigzagTraversal = function (grid) {
-  let rows = grid.length,
-    cols = grid[0].length;
-  let i = 0,
-    j = 0;
-  let flag = true;
-  while (i < rows && j < cols) {
-    if (flag) {
-      i += 2;
-      if(i>)
-    } else {
-      i -= 2;
+  let ans = [];
+  let ok = true;
+  for (let i = 0; i < grid.length; i++) {
+    let row = grid[i];
+    if (i & 1) {
+      row.reverse();
+    }
+    for (let x of row) {
+      if (ok) ans.push(x);
+      ok = !ok;
     }
   }
+  return ans;
 };

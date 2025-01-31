@@ -27,7 +27,8 @@ import yayJpg from '../assets/yay.jpg';
 // import minimumOperations from '@/common/weekly/430/3402.self'
 // import constructGridLayout from '@/common/weekly/418/3311.js';
 // import smallestTrimmedNumbers from '@/common/weekly/302/2343';
-import equalPairs from '@/common/weekly/303/2352'
+import equalPairs from '@/common/weekly/303/2352';
+import countGoodIntegers from '@/common/weekly/d138/3272';
 export default function HomePage() {
   // console.log(finalPositionOfSnake(3, ['DOWN', 'RIGHT', 'UP']));
   // console.log(finalPositionOfSnake(2, ['RIGHT', 'DOWN']));
@@ -41,6 +42,7 @@ export default function HomePage() {
     ])
   ); */
   console.log('没有到这里么');
+  console.log(countGoodIntegers(3, 5));
   // console.log(
   //   constructGridLayout(4, [
   //     [0, 1],
@@ -49,7 +51,7 @@ export default function HomePage() {
   //     [2, 3],
   //   ])
   // );
- /*  console.log(
+  /*  console.log(
     smallestTrimmedNumbers(
       ['102', '473', '251', '814'],
       [
@@ -60,7 +62,7 @@ export default function HomePage() {
       ]
     )
   ); */
-  console.log(equalPairs([[3,2,1],[1,7,6],[2,7,7]]))
+  // console.log(equalPairs([[3,2,1],[1,7,6],[2,7,7]]))
   // console.log(maxFreq('aababcaab', 2, 3, 4));
   // console.log(maxFreq('aaaa', 1, 3, 3));
   // console.log(countGoodArrays(3, 2, 1));
