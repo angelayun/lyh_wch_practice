@@ -3,7 +3,7 @@ let LPF = new Array(MX).fill(0);
 for (let i = 2; i < MX; i++) {
   if (LPF[i] == 0) {
     for (let j = i; j < MX; j += i) {
-      if (LPF[j] == 0) {
+      if (LPF[j] != 0) {
         LPF[j] = i;
       }
     }
