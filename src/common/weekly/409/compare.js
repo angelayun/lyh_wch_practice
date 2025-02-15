@@ -1,13 +1,13 @@
-let directions = [
-  [0, -1],
+const directions = [
   [-1, 0],
-  [0, 1],
+  [0, -1],
   [1, 0],
+  [0, 1],
 
-  [-1, -1],
-  [1, -1],
-  [-1, 1],
   [1, 1],
+  [-1, -1],
+  [-1, 1],
+  [1, -1],
 ];
 /**
  * @param {number[][]} grid
@@ -22,13 +22,13 @@ var NeighborSum = function (grid) {
         let [dx, dy] = directions[k];
         dx += i;
         dy += j;
-        if (dx >= 0 && dx < n && dy >= 0 && dy < n) {
+        if (dx >= 0 && dy >= 0 && dx < n && dy < n) {
           sum[v][~~(k / 4)] += grid[dx][dy];
         }
       }
     }
   }
-  this.grid = sum;
+  this.sum = sum;
 };
 
 /**
@@ -36,7 +36,7 @@ var NeighborSum = function (grid) {
  * @return {number}
  */
 NeighborSum.prototype.adjacentSum = function (value) {
-  return this.grid[value][0];
+  return this.sum[value][0];
 };
 
 /**
@@ -44,7 +44,7 @@ NeighborSum.prototype.adjacentSum = function (value) {
  * @return {number}
  */
 NeighborSum.prototype.diagonalSum = function (value) {
-  return this.grid[value][1];
+  return this.sum[value][1];
 };
 
 /**
