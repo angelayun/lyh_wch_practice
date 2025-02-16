@@ -1,4 +1,4 @@
-const MOD = Math.pow(10, 9) + 7;
+const MOD = BigInt(1e9 + 7);
 const MX = Math.pow(10, 5) + 1;
 // 初始化 omega 数组
 let omega = new Array(MX).fill(0);
@@ -13,6 +13,21 @@ for (let i = 2; i < MX; i++) {
       omega[j]++;
     }
   }
+}
+// 快速幂模板
+function pow(x, n, mod) {
+  x = BigInt(x);
+  n = BigInt(n);
+  mod = BigInt(mod);
+  let res = 1n;
+  while (n) {
+    if (n % 2n) {
+      res = (res * x) % mod;
+    }
+    x = (x * x) % mod;
+    n = n >> 1n;
+  }
+  return res;
 }
 /**
  * @param {number[]} nums
@@ -44,7 +59,7 @@ var maximumScore = function (nums, k) {
   }
 
   // 初始化最终结果为 1
-  let ans = 1;
+  let ans = 1n;
   // 对 (索引, 值, 左侧最近元素下标, 右侧最近元素下标) 组成的数组进行排序，按值从大到小排序
   let combined = [];
   for (let i = 0; i < n; i++) {
@@ -59,14 +74,14 @@ var maximumScore = function (nums, k) {
     // 如果总操作次数大于等于剩余操作次数 k
     if (tot >= k) {
       // 计算 v 的 k 次幂对 MOD 取模的结果，并更新最终结果
-      ans = ((ans * Math.pow(v, k)) % MOD) % MOD;
+      ans = (ans * pow(v, k, MOD)) % MOD;
       break;
     }
     // 计算 v 的 tot 次幂对 MOD 取模的结果，并更新最终结果
-    ans = ((ans * Math.pow(v, tot)) % MOD) % MOD;
+    ans = (ans * pow(v, tot, MOD)) % MOD;
     // 更新剩余操作次数
     k -= tot;
   }
   // 返回最终结果
-  return ans;
+  return Number(ans);
 };
