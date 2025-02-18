@@ -29,10 +29,17 @@ var minimumLines = function (stockPrices) {
     preDx = 0;
   let n = stockPrices.length;
   let ans = 0;
+  function isEqual1(a, b) {
+    const multiplier = 1000; // 根据小数位数调整倍数
+    return Math.round(a * multiplier) === Math.round(b * multiplier);
+  }
+  function isEqual(a, b) {
+    return Math.abs(a - b) < Number.EPSILON;
+  }
   for (let i = 1; i < n; i++) {
     let dy = stockPrices[i][1] - stockPrices[i - 1][1];
     let dx = stockPrices[i][0] - stockPrices[i - 1][0];
-    if (dy * preDx != dx * preDy) {
+    if (isEqual(dy * preDx) != isEqual(dx * preDy)) {
       ans++;
       preDy = dy;
       preDx = dx;
