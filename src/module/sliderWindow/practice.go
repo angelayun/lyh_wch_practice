@@ -1,13 +1,16 @@
 package sliderwindow
 
 import (
+	"fmt"
 	"math"
+	"slices"
 	"sort"
 	"strconv"
 )
 
 // 1456
 func maxVowels(s string, k int) (ans int) {
+	fmt.Println("test")
 	vowel := 0
 	for i, in := range s {
 		// a, e, i, o, u
@@ -597,6 +600,76 @@ func maximumUniqueSubarray(nums []int) (maxSum int) {
 		sum += v
 		set[v] = true
 		maxSum = max(maxSum, sum)
+	}
+	return
+}
+
+// 2958
+func maxSubarrayLength(nums []int, k int) (maxLen int) {
+	cnt := map[int]int{}
+	left := 0
+	for i, v := range nums {
+		cnt[v]++
+		for cnt[v] > k {
+			cnt[nums[left]]--
+			left++
+		}
+		maxLen = max(i-left+1, maxLen)
+	}
+	return
+}
+
+// 2779
+func maximumBeauty(nums []int, k int) (maxLen int) {
+	// 从小到大排序
+	// sort.Ints(nums)
+	slices.Sort(nums)
+	left := 0
+	for i, v := range nums {
+		for left <= i && nums[left] < v-2*k {
+			left++
+		}
+		maxLen = max(maxLen, i-left+1)
+	}
+	return
+}
+
+// 2024
+func maxConsecutiveAnswers(answerKey string, k int) (cnt int) {
+	oper := [2]int{}
+	left := 0
+	for i, v := range answerKey {
+		if v == 'T' {
+			oper[0]++
+		} else {
+			oper[1]++
+		}
+		for oper[0] > k && oper[1] > k {
+			outer := answerKey[left]
+			if outer == 'T' {
+				oper[0]--
+			} else {
+				oper[1]--
+			}
+			left++
+		}
+		cnt = max(cnt, i-left+1)
+	}
+	return
+}
+
+// 2024  这是灵神简洁的代码
+func maxConsecutiveAnswers1(answerKey string, k int) (cnt int) {
+	oper := [2]int{}
+	left := 0
+	for i, v := range answerKey {
+		oper[v>>1&1]++
+		for oper[0] > k && oper[1] > k {
+			outer := answerKey[left]
+			oper[outer>>1&1]--
+			left++
+		}
+		cnt = max(cnt, i-left+1)
 	}
 	return
 }
