@@ -2,6 +2,8 @@ package sliderwindow
 
 import (
 	"math"
+	"sort"
+	"strconv"
 )
 
 // 1456
@@ -319,7 +321,7 @@ func maximumLengthSubstring1(s string) (maxLen int) {
 // 1297
 func maxFreq(s string, maxLetters int, minSize int, maxSize int) int {
 	// TODO 这个没做出来
-	cnt := map[string]int{}
+	// cnt := map[string]int{}
 	left := 0
 	winCnt := map[rune]int{}
 
@@ -336,4 +338,265 @@ func maxFreq(s string, maxLetters int, minSize int, maxSize int) int {
 		// cnt[s[]]
 	}
 	return 0
+}
+
+// 1461
+func hasAllCodes(s string, k int) bool {
+	set := map[string]bool{}
+	n := len(s)
+	for i := 0; i <= n-k; i++ {
+		set[s[i:i+k]] = true
+	}
+	return len(set) == 1<<k
+}
+
+// 2134
+func minSwaps1(nums []int) int {
+	// 先统计1的个数
+	// 定长为k个数的窗口中0的数量最少
+	cnt1 := 0
+	for _, v := range nums {
+		if v == 1 {
+			cnt1++
+		}
+	}
+	// println("1的个数是", cnt1)
+	n := len(nums)
+	if cnt1 == 0 {
+		return 0
+	}
+	winCnt0 := 0
+	minWinCnt0 := math.MaxInt
+	for i := 0; i < n*2; i++ {
+		x := nums[i%n]
+		if x == 0 {
+			winCnt0++
+		}
+		if i < cnt1-1 {
+			continue
+		}
+		// println(i,winCnt0)
+		minWinCnt0 = min(minWinCnt0, winCnt0)
+		o := (i - cnt1 + 1) % n
+		outE := nums[o]
+		if outE == 0 {
+			winCnt0--
+		}
+	}
+	return minWinCnt0
+}
+
+// 下面是灵神的写法
+func minSwaps(nums []int) int {
+	// 先统计1的个数
+	// 定长为k个数的窗口中1的数量最大
+	cnt1 := 0
+	for _, v := range nums {
+		cnt1 += v
+	}
+	// println("1的个数是", cnt1)
+	n := len(nums)
+
+	winCnt1 := 0
+	maxWinCnt1 := math.MinInt
+	for i := 0; i < n*2; i++ {
+		x := nums[i%n]
+		winCnt1 += x
+		if i < cnt1-1 {
+			continue
+		}
+		// println(i,winCnt0)
+		maxWinCnt1 = max(maxWinCnt1, winCnt1)
+		winCnt1 -= nums[(i-cnt1+1)%n]
+	}
+	return cnt1 - maxWinCnt1
+}
+
+// 2653
+func getSubarrayBeauty(nums []int, k int, x int) []int {
+	const bias = 50
+	cnt := [bias*2 + 1]int{}
+	ans := make([]int, len(nums)-k+1)
+	for i, in := range nums {
+		// 滑入窗口
+		cnt[in+bias]++
+		if i < k-1 {
+			continue
+		}
+		left := x
+		for j, v := range cnt[:bias] {
+			left -= v
+			if left <= 0 {
+				ans[i-k+1] = j - bias
+				break
+			}
+		}
+		// 滑出窗口
+		cnt[nums[i-k+1]+50]--
+	}
+	return ans
+}
+
+// 2269
+func divisorSubstrings(num int, k int) (ans int) {
+	s := strconv.Itoa(num)
+	n := len(s)
+
+	for i := 0; i <= n-k; i++ {
+		v, _ := strconv.Atoi(s[i : i+k])
+		if v > 0 && num%v == 0 {
+			ans++
+		}
+	}
+	return
+}
+
+// 1984
+func minimumDifference(nums []int, k int) int {
+	ans := math.MaxInt
+	// 从小到大排序
+	sort.Ints(nums)
+	for i := k - 1; i < len(nums); i++ {
+		mn := nums[i-k+1]
+		mx := nums[i]
+		ans = min(ans, mx-mn)
+	}
+	return ans
+}
+
+// 624
+func maxDistance1(arrays [][]int) (ans int) {
+	// 这个写法是O(n^2) 会超时的
+	for i := 0; i < len(arrays); i++ {
+		for j := 0; j < len(arrays); j++ {
+			if i == j {
+				continue
+			}
+			ans = max(ans,
+				arrays[j][len(arrays[j])-1]-arrays[i][0],
+				arrays[i][len(arrays[i])-1]-arrays[j][0])
+		}
+	}
+	return
+}
+func maxDistance(arrays [][]int) (ans int) {
+	mn := math.MaxInt >> 1
+	mx := math.MinInt >> 1
+	for _, a := range arrays {
+		x := a[0]
+		y := a[len(a)-1]
+		ans = max(ans, y-mn, mx-x)
+		mn = min(mn, x)
+		mx = max(mx, y)
+	}
+	return
+}
+
+// 1493
+func longestSubarray(nums []int) int {
+	maxlen := 0
+	n := len(nums)
+	left := 0
+	// 窗口中包含0的个数
+	winCnt0 := 0
+	for right := 0; right < n; right++ {
+		if nums[right] == 0 {
+			winCnt0++
+		}
+		for left <= right && winCnt0 > 1 {
+			if nums[left] == 0 {
+				winCnt0--
+			}
+			left++
+		}
+		maxlen = max(maxlen, right-left+1-max(1, winCnt0))
+	}
+	return maxlen
+}
+
+// 1208
+func abs(a int) int {
+	if a > 0 {
+		return a
+	}
+	return -a
+}
+func equalSubstring(s string, t string, maxCost int) int {
+	maxlen := 0
+	n := len(s)
+	left := 0
+	// 窗口中的预算
+	winCost := 0
+	for right := 0; right < n; right++ {
+		cost := abs(int(s[right]) - int(t[right]))
+		winCost += cost
+		for left <= right && winCost > maxCost {
+			cost = abs(int(s[left]) - int(t[left]))
+			winCost -= cost
+			left++
+		}
+		maxlen = max(maxlen, right-left+1)
+	}
+	return maxlen
+}
+
+// 2730
+func longestSemiRepetitiveSubstring(s string) (maxLen int) {
+	// 是否有相邻且相等的
+	cnt := 0
+	left := 0
+	for i, c := range s {
+		if i > 0 && rune(s[i-1]) == c {
+			cnt++
+		}
+		for left <= i && cnt > 1 {
+			if s[left+1] == s[left] {
+				cnt--
+			}
+			left++
+		}
+		maxLen = max(maxLen, i-left+1)
+	}
+	return
+}
+
+// 904
+func totalFruit(fruits []int) (ans int) {
+	// TODO
+	return
+}
+
+// 这是别人写的 说明for里第一句是可以多条声明语句的
+func maximumUniqueSubarray1(nums []int) (maxSum int) {
+	set := map[int]bool{}
+	for start, end, sum := 0, 0, 0; end < len(nums); end++ {
+		//题目说了,删除包含若干个不同元素的子数组,如果重复,那肯定是不需要的.
+		for set[nums[end]] { // 因重复而剔除start元素
+			sum -= nums[start]
+			delete(set, nums[start])
+			start++
+		}
+		sum += nums[end]          // 加入end元素后的sum
+		maxSum = max(maxSum, sum) // 求max
+		set[nums[end]] = true     // 加入end元素
+	}
+	return
+}
+
+// 1695
+func maximumUniqueSubarray(nums []int) (maxSum int) {
+	set := map[int]bool{}
+	left := 0
+	sum := 0
+	for _, v := range nums {
+		for set[v] {
+			set[nums[left]] = false
+			sum -= nums[left]
+			left++
+		}
+		sum += v
+		set[v] = true
+		maxSum = max(maxSum, sum)
+	}
+	return
 }
