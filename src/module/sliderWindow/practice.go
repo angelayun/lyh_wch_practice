@@ -6,6 +6,7 @@ import (
 	"slices"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 // 1456
@@ -565,7 +566,20 @@ func longestSemiRepetitiveSubstring(s string) (maxLen int) {
 
 // 904
 func totalFruit(fruits []int) (ans int) {
-	// TODO
+	// 也就是说map里面的size最多只能为2  求最长宽度
+	cnt := map[int]int{}
+	left := 0
+	for i, v := range fruits {
+		cnt[v]++
+		for len(cnt) > 2 {
+			cnt[fruits[left]]--
+			if cnt[fruits[left]] == 0 {
+				delete(cnt, fruits[left])
+			}
+			left++
+		}
+		ans = max(ans, i-left+1)
+	}
 	return
 }
 
@@ -671,5 +685,293 @@ func maxConsecutiveAnswers1(answerKey string, k int) (cnt int) {
 		}
 		cnt = max(cnt, i-left+1)
 	}
+	return
+}
+
+// 1004
+func longestOnes1(nums []int, k int) (maxLen int) {
+	// 窗口中0的个数
+	winCnt0 := 0
+	left := 0
+	for i, v := range nums {
+		if v == 0 {
+			winCnt0++
+		}
+		for winCnt0 > k {
+			if nums[left] == 0 {
+				winCnt0--
+			}
+			left++
+		}
+		maxLen = max(maxLen, i-left+1)
+	}
+	return
+}
+func longestOnes(nums []int, k int) (maxLen int) {
+	// 窗口中0的个数
+	winCnt0 := 0
+	left := 0
+	for i, v := range nums {
+		// 像这种要判断的地方多想一下是否可以不要if
+		winCnt0 += 1 - v
+		for winCnt0 > k {
+			winCnt0 -= 1 - nums[left]
+			left++
+		}
+		maxLen = max(maxLen, i-left+1)
+	}
+	return
+}
+
+// 1658
+func minOperations_1658(nums []int, x int) (ans int) {
+	// 先求出totalSum
+	// 中间target 的最大长度
+	totalSum := 0
+	for _, v := range nums {
+		totalSum += v
+	}
+	target := totalSum - x
+	if target < 0 {
+		return -1
+	}
+	winSum := 0
+	left := 0
+	winMaxLen := -1
+	for i, v := range nums {
+		winSum += v
+		for winSum > target {
+			winSum -= nums[left]
+			left++
+		}
+		if winSum == target {
+			winMaxLen = max(winMaxLen, i-left+1)
+		}
+	}
+	if winMaxLen == -1 {
+		return winMaxLen
+	} else {
+		return len(nums) - winMaxLen
+	}
+}
+
+// 1838
+func maxFrequency1(nums []int, k int) int {
+	n := len(nums)
+	// 特殊情况  当只有一个元素的时候
+	if n == 1 {
+		return 1
+	}
+	sort.Ints(nums)
+	ans := -1
+	cnt := 0
+	left := 0
+	for i := 1; i < len(nums); i++ {
+		// 前面的元素都变成当前元素
+		cnt += (i - left) * (nums[i] - nums[i-1])
+		for left <= i && cnt > k {
+			// 移除最左边元素的增量
+			cnt -= nums[i] - nums[left]
+			left++
+		}
+		if cnt <= k && cnt >= 0 {
+			ans = max(ans, i-left+1)
+		}
+	}
+	return ans
+}
+
+// 1838  我晕呢  上面的写法优化下来只剩下这么点了
+func maxFrequency(nums []int, k int) int {
+	n := len(nums)
+	sort.Ints(nums)
+	ans := 1
+	cnt := 0
+	left := 0
+	for i := 1; i < n; i++ {
+		// 前面的元素都变成当前元素
+		cnt += (i - left) * (nums[i] - nums[i-1])
+		for cnt > k {
+			// 移除最左边元素的增量
+			cnt -= nums[i] - nums[left]
+			left++
+		}
+		ans = max(ans, i-left+1)
+	}
+	return ans
+}
+
+// 2516
+func takeCharacters(s string, k int) int {
+	cnt := [3]int{}
+	// 整个s字符串每种字符的个数
+	for _, v := range s {
+		// 一开始，把所有字母都取走
+		cnt[v-'a']++
+	}
+	// 字母个数不足 k
+	if cnt[0] < k || cnt[1] < k || cnt[2] < k {
+		return -1
+	}
+	left := 0
+	mx, left := 0, 0
+	for i, v := range s {
+		// 移入窗口，相当于不取走 c
+		cnt[v-'a']--
+		// 窗口之外的 c 不足 k
+		for cnt[v-'a'] < k {
+			// 移出窗口，相当于取走 s[left]
+			cnt[s[left]-'a']++
+			left++
+		}
+		mx = max(mx, i-left+1)
+	}
+	return len(s) - mx
+}
+
+// 2831
+func longestEqualSubarray(nums []int, k int) (ans int) {
+	posLists := make([][]int, len(nums)+1)
+	for i, x := range nums {
+		posLists[x] = append(posLists[x], i)
+	}
+	for _, pos := range posLists {
+		if len(pos) <= ans {
+			// 无法让ans变得更大
+			continue
+		}
+		left := 0
+		for right, p := range pos {
+			// p-pos[left]+1 这个是整段长度  right-left+1是窗口长度
+			for p-pos[left]+1-(right-left+1) > k {
+				left++
+			}
+			ans = max(ans, right-left+1)
+		}
+	}
+	return
+}
+
+// 2271
+func maximumWhiteTiles(tiles [][]int, carpetLen int) (ans int) {
+	slices.SortFunc(tiles, func(a, b []int) int {
+		return a[0] - b[0]
+	})
+	cover := 0
+	n := len(tiles)
+	left := 0
+	for right := 0; right < n; right++ {
+		// 把右边长度加进来
+		cover += tiles[right][1] - tiles[right][0] + 1
+		for tiles[left][1] < tiles[right][1]-carpetLen+1 {
+			cover -= tiles[left][1] - tiles[left][0] + 1
+			left++
+		}
+		uncover := max(0, tiles[right][1]-carpetLen+1-tiles[left][0])
+		ans = max(ans, cover-uncover)
+	}
+	return ans
+}
+
+// 2555
+func maximizeWin(pos []int, k int) (ans int) {
+	n := len(pos)
+	preSum := make([]int, n+1)
+	left := 0
+	for right := 0; right < n; right++ {
+		for pos[right]-pos[left] > k {
+			left++
+		}
+		ans = max(ans, right-left+1+preSum[left])
+		// 上一个线段的最大长度
+		preSum[right+1] = max(preSum[right], right-left+1)
+	}
+	return ans
+}
+
+// 2009
+func minOperations_2009(nums []int) int {
+	n := len(nums)
+	slices.Sort(nums)
+	a := slices.Compact(nums)
+	left := 0
+	ans := 0
+	for right, x := range a {
+		for a[left] < x-n+1 {
+			left++
+		}
+		ans = max(ans, right-left+1)
+	}
+	return n - ans
+}
+
+// 209
+func minSubArrayLen1(target int, nums []int) int {
+	// 我自己写的循环内更新
+	ans := math.MaxInt
+	left, sum := 0, 0
+	for right, x := range nums {
+		sum += x
+		for sum >= target {
+			ans = min(ans, right-left+1)
+			sum -= nums[left]
+			left++
+		}
+	}
+	if ans == math.MaxInt {
+		return 0
+	}
+	return ans
+}
+func minSubArrayLen(target int, nums []int) int {
+	// 循环外更新
+	ans := math.MaxInt
+	left, sum := 0, 0
+	for right, x := range nums {
+		sum += x
+		for sum-nums[left] >= target {
+			sum -= nums[left]
+			left++
+		}
+		if sum >= target {
+			ans = min(ans, right-left+1)
+		}
+	}
+	if ans == math.MaxInt {
+		return 0
+	}
+	return ans
+}
+
+// 2904
+func shortestBeautifulSubstring(s string, k int) string {
+	if strings.Count(s, "1") < k {
+		return ""
+	}
+	ans := s
+	left := 0
+	// 窗口中1的个数
+	cnt := 0
+	// minLen := math.MaxInt
+	for right, c := range s {
+		// cnt += int(c - '0')
+		cnt += int(c & 1)
+
+		for cnt > k || s[left] == '0' {
+			cnt -= int(s[left] & 1)
+			left++
+		}
+		if cnt == k {
+			t := s[left : right+1]
+			if len(t) < len(ans) || (len(t) == len(ans) && t < ans) {
+				ans = t
+			}
+		}
+	}
+	return ans
+}
+
+// 1234
+func balancedString(s string) (ans int) {
 	return
 }

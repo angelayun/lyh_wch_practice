@@ -6,6 +6,20 @@ import (
 )
 
 func Test_maxVowels(t *testing.T) {
+	res := shortestBeautifulSubstring("100011001", 3)
+	// res := maximumWhiteTiles([][]int{
+	// 	{1, 5}, {10, 11}, {12, 18}, {20, 25}, {30, 32},
+	// }, 10)
+	// res := longestEqualSubarray([]int{1, 3, 2, 3, 1, 3}, 3)
+	// res := takeCharacters("aabaaaacaabc", 2)
+	// res := maxFrequency([]int{1, 4, 8, 13}, 5)
+	// res := maxFrequency([]int{1, 2, 4}, 5)
+	// res := maxFrequency([]int{3, 9, 6}, 2)
+
+	// res := minOperations([]int{1, 1, 4, 2, 3}, 5)
+	// res := longestOnes([]int{0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1}, 3)
+
+	fmt.Println((res))
 	/* res := maxVowels("abciiidef", 3)
 	println(res) */
 	/* res := findMaxAverage([]int{1, 12, -5, -6, 50, 3}, 4)
@@ -26,6 +40,7 @@ func Test_maxVowels(t *testing.T) {
 	// res := longestSubarray([]int{0, 1, 1, 1, 0, 1, 1, 0, 1})
 	// res := equalSubstring("abcd", "bcdf", 3)
 	// res := longestSemiRepetitiveSubstring("52233")
-	res := maximumUniqueSubarray([]int{4, 2, 4, 5, 6})
-	fmt.Println((res))
+	// res := maximumUniqueSubarray([]int{4, 2, 4, 5, 6})
+	// res := longestOnes([]int{1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0}, 2)
+
 }
