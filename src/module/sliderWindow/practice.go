@@ -971,7 +971,308 @@ func shortestBeautifulSubstring(s string, k int) string {
 	return ans
 }
 
-// 1234
-func balancedString(s string) (ans int) {
+// 1234 这个确实不是那么容易理解  "WQWRQQQW"
+// 'Q', 'W', 'E', 'R'
+// WQWRQQQW
+// WQERQERW
+func balancedString(s string) int {
+	// TODO 这个题意还需要再理解一下
+	n := len(s)
+	m := n / 4
+	cnt := ['X']int{}
+	for _, c := range s {
+		cnt[c]++
+	}
+	if cnt['W'] == m && cnt['E'] == m && cnt['R'] == m && cnt['Q'] == m {
+		return 0
+	}
+	ans := len(s)
+	left := 0
+	for right, c := range s {
+		cnt[c]--
+		for cnt['W'] <= m && cnt['E'] <= m && cnt['R'] <= m && cnt['Q'] <= m {
+			fmt.Println(left, right)
+			ans = min(ans, right-left+1)
+			cnt[s[left]]++
+			left++
+		}
+	}
+	return ans
+}
+
+// 2875
+func minSizeSubarray(nums []int, target int) int {
+	totalSum := 0
+	for _, x := range nums {
+		totalSum += x
+	}
+	ans := math.MaxInt
+	winTarget := target % totalSum
+	left, s, n := 0, 0, len(nums)
+	for right := 0; right < 2*n; right++ {
+		x := nums[right%n]
+		s += x
+		for s > winTarget {
+			s -= nums[left%n]
+			left++
+		}
+		if s == winTarget {
+			ans = min(ans, right-left+1)
+		}
+	}
+	if ans == math.MaxInt {
+		return -1
+	}
+	return ans + target/totalSum*n
+}
+
+// 76
+func minWindow(s string, t string) string {
+	cnt := [128]int{}
+	needCount := 0
+	for _, c := range t {
+		if cnt[c] == 0 {
+			needCount++
+		}
+		cnt[c]++
+	}
+	ansLeft, ansRight := -1, len(s)
+	left := 0
+	for right, c := range s {
+		cnt[c]--
+		if cnt[c] == 0 {
+			needCount--
+		}
+		for needCount == 0 {
+			if right-left < ansRight-ansLeft {
+				ansLeft, ansRight = left, right
+			}
+			if cnt[s[left]] == 0 {
+				needCount++
+			}
+			cnt[s[left]]++
+			left++
+		}
+	}
+	if ansLeft < 0 {
+		return ""
+	}
+	return s[ansLeft : ansRight+1]
+}
+
+// 1358
+func numberOfSubstrings(s string) (ans int) {
+	cnt := [3]int{}
+	left := 0
+	for _, c := range s {
+		cnt[c-'a']++
+		// for cnt[0] > 0 && cnt[1] > 0 && cnt[2] > 0 {
+
+		for cnt[0] >= 1 && cnt[1] >= 1 && cnt[2] >= 1 {
+			cnt[s[left]-'a']--
+			left++
+		}
+		ans += left
+	}
 	return
+}
+
+// 2962
+func countSubarrays1(nums []int, k int) (ans int64) {
+	mx := math.MinInt
+	for _, v := range nums {
+		mx = max(mx, v)
+	}
+	left := 0
+	cnt := 0
+	for _, v := range nums {
+		if v == mx {
+			cnt++
+		}
+		for cnt >= k {
+			if nums[left] == mx {
+				cnt--
+			}
+			left++
+		}
+		ans += int64(left)
+	}
+	return
+}
+
+// 灵神  数组求最大值
+func countSubarrays_2962(nums []int, k int) (ans int64) {
+	mx := slices.Max(nums)
+	left := 0
+	cnt := 0
+	for _, v := range nums {
+		if v == mx {
+			cnt++
+		}
+		for cnt >= k {
+			if nums[left] == mx {
+				cnt--
+			}
+			left++
+		}
+		ans += int64(left)
+	}
+	return
+}
+
+// 3325
+func numberOfSubstrings(s string, k int) (ans int) {
+	cnt := [26]int{}
+	left := 0
+	for _, c := range s {
+		cnt[c-'a']++
+		// 第一反应是判断cn中任一一个字符>=k  但是当前只有c-'a'这个index操作了 所以判断这一个就行了
+		for cnt[c-'a'] >= k {
+			cnt[s[left]-'a']--
+			left++
+		}
+		ans += left
+	}
+	return ans
+}
+
+// 2799
+func countCompleteSubarrays(nums []int) (ans int) {
+	cnt := map[int]int{}
+	for _, v := range nums {
+		cnt[v]++
+	}
+	winCnt := map[int]int{}
+	left := 0
+	for _, v := range nums {
+		winCnt[v]++
+		for len(winCnt) == len(cnt) {
+			winCnt[nums[left]]--
+			if winCnt[nums[left]] == 0 {
+				delete(winCnt, nums[left])
+			}
+			left++
+		}
+		ans += left
+	}
+	return ans
+}
+
+// 2537  这个题目第一反应没出来
+func countGood(nums []int, k int) (ans int64) {
+	cnt := map[int]int{}
+	left := 0
+	pair := 0
+	for _, v := range nums {
+		pair += cnt[v]
+		cnt[v]++
+		for pair >= k {
+			cnt[nums[left]]--
+			pair -= cnt[nums[left]]
+			left++
+		}
+		ans += int64(left)
+	}
+	return ans
+}
+
+// 3298
+func validSubstringCount(word1 string, word2 string) (ans int64) {
+	cnt := [26]int{}
+	needCount := 0
+	for _, c := range word2 {
+		if cnt[c-'a'] == 0 {
+			needCount++
+		}
+		cnt[c-'a']++
+	}
+	left := 0
+	for _, c := range word1 {
+		cnt[c-'a']--
+		if cnt[c-'a'] == 0 {
+			needCount--
+		}
+		for needCount == 0 {
+			if cnt[word1[left]-'a'] == 0 {
+				needCount++
+			}
+			cnt[word1[left]-'a']++
+			left++
+		}
+		ans += int64(left)
+	}
+	return ans
+}
+
+// 713
+func numSubarrayProductLessThanK(nums []int, k int) (ans int) {
+	prod := 1
+	left := 0
+	for right, v := range nums {
+		prod *= v
+		for left <= right && prod >= k {
+			prod /= nums[left]
+			left++
+		}
+		ans += right - left + 1
+	}
+	return
+}
+
+// 3258
+func countKConstraintSubstrings(s string, k int) (ans int) {
+	cnt := [2]int{}
+	left := 0
+	for right, c := range s {
+		cnt[c&1]++
+		for cnt[0] > k && cnt[1] > k {
+			cnt[s[left]&1]--
+			left++
+		}
+		ans += right - left + 1
+	}
+	return
+}
+
+// 2302
+func countSubarrays(nums []int, k int64) (ans int64) {
+	var sum int64 = 0
+	left := 0
+	for right, v := range nums {
+		sum += int64(v)
+		for int64(right-left+1)*sum >= k {
+			sum -= int64(nums[left])
+			left++
+		}
+		ans += int64(right) - int64(left) + 1
+	}
+	return
+}
+
+// 2762 温习
+func continuousSubarrays(nums []int) (ans int64) {
+	// 求子数组中最大值减去最小值不能大于2
+	cnt := map[int]int{}
+	left := 0
+	for right, v := range nums {
+		cnt[v]++
+		for {
+			mx, mn := v, v
+			for k := range cnt {
+				mx = max(mx, k)
+				mn = min(mn, k)
+			}
+			if mx-mn <= 2 {
+				break
+			}
+			y := nums[left]
+			cnt[y]--
+			if cnt[y] == 0 {
+				delete(cnt, y)
+			}
+			left++
+		}
+		ans += int64(right - left + 1)
+	}
+	return ans
 }
