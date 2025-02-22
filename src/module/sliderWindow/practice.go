@@ -1276,3 +1276,16 @@ func continuousSubarrays(nums []int) (ans int64) {
 	}
 	return ans
 }
+
+// 930 要温习
+func numSubarraysWithSum(nums []int, goal int) (ans int) {
+	sum := 0
+	cnt := map[int]int{}
+	cnt[0] = 1
+	for _, v := range nums {
+		sum += v
+		ans += cnt[sum-goal]
+		cnt[sum]++
+	}
+	return
+}
