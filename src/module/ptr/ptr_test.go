@@ -6,7 +6,12 @@ import (
 )
 
 func Test_isPalindrome(t *testing.T) {
-	res := isPalindrome("A man, a plan, a canal: Panama")
+	// res := findLengthOfLCIS([]int{1, 3, 5, 4, 7})
+	res := longestAlternatingSubarray([]int{3, 2, 5, 4}, 5)
+	// res := longestAlternatingSubarray([]int{2, 3, 4, 5}, 4)
+	// res := summaryRanges([]int{0, 1, 2, 4, 5, 7})
+	// res := camelMatch([]string{"FooBaB"}, "FB")
+	// res := isPalindrome("A man, a plan, a canal: Panama")
 	fmt.Println(res)
 	/* type args struct {
 		s string
