@@ -6,8 +6,11 @@ import (
 )
 
 func Test_isPalindrome(t *testing.T) {
+	// res := longestMountain([]int{2, 1, 4, 7, 3, 2, 5})
+	res := longestMountain([]int{2, 2,2})
+
 	// res := findLengthOfLCIS([]int{1, 3, 5, 4, 7})
-	res := longestAlternatingSubarray([]int{3, 2, 5, 4}, 5)
+	// res := longestAlternatingSubarray([]int{3, 2, 5, 4}, 5)
 	// res := longestAlternatingSubarray([]int{2, 3, 4, 5}, 4)
 	// res := summaryRanges([]int{0, 1, 2, 4, 5, 7})
 	// res := camelMatch([]string{"FooBaB"}, "FB")

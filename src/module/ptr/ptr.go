@@ -3,6 +3,7 @@ package ptr
 import (
 	"fmt"
 	"math"
+	"math/bits"
 	"slices"
 	"sort"
 	"strconv"
@@ -1534,4 +1535,352 @@ func reductionOperations(nums []int) (ans int) {
 		k++
 	}
 	return
+}
+
+// 845
+func longestMountain(arr []int) (ans int) {
+	n := len(arr)
+	i := 0
+	for i < n-2 {
+		for i+1 < n && arr[i+1] <= arr[i] {
+			i++
+			continue
+		}
+		start := i
+		// 这个是上升段
+		for i+1 < n && arr[i+1] > arr[i] {
+			i++
+		}
+		// 这个是顶峰
+		peek := i
+		for i+1 < n && arr[i+1] < arr[i] {
+			i++
+		}
+		if i > peek {
+			ans = max(ans, i-start+1)
+		}
+	}
+	return ans
+}
+
+// 2038
+func winnerOfGame(colors string) bool {
+	n := len(colors)
+	cnt := 0
+	ans := 0
+	for i := 1; i < n-1; i++ {
+		if colors[i] == colors[i-1] && colors[i] == colors[i+1] {
+			cnt++
+			if colors[i] == 'A' {
+				ans += cnt
+			} else {
+				ans -= cnt
+			}
+		} else {
+			cnt = 0
+		}
+	}
+	return ans > 0
+}
+
+// 1759
+func calcSize(n int) int {
+	const MOD = 1e9 + 7
+	return (1 + n) * n / 2 % (MOD)
+}
+func countHomogenous(s string) (ans int) {
+	n := len(s)
+	const MOD = 1e9 + 7
+	i := 0
+	for i < n {
+		start := i
+		for i+1 < n && s[i+1] == s[i] {
+			i++
+		}
+		groupSize := i - start
+		ans += calcSize(groupSize)
+
+	}
+	return ans % MOD
+}
+
+// 3011
+func canSortArray(nums []int) bool {
+	n := len(nums)
+	for i := 0; i < n; {
+		start := i
+		i++
+		for i < n && bits.OnesCount(uint(nums[i-1])) == bits.OnesCount(uint(nums[i])) {
+			i++
+		}
+		slices.Sort(nums[start:i])
+	}
+	return slices.IsSorted(nums)
+}
+
+// 1578
+func minCost(colors string, neededTime []int) (ans int) {
+	n := len(colors)
+	i := 0
+	for i < n {
+		sum := 0
+		maxVal := 0
+		ch := colors[i]
+		for i < n && colors[i] == ch {
+			sum += neededTime[i]
+			maxVal = max(neededTime[i], maxVal)
+			i++
+		}
+		// [start,i) 这一段需要移除只剩下一个
+		ans += sum - maxVal
+	}
+	return ans
+}
+
+// 1839 要温习  挺有难度的  现在还是很理解  这个是灵神的题解
+func longestBeautifulSubstring(s string) (ans int) {
+	const vowel = "aeiou"
+	cur, sum := 0, 0
+	for i, n := 0, len(s); i < n; {
+		start := i
+		ch := s[start]
+		for i < n && s[i] == ch {
+			i++
+		}
+
+		if ch != vowel[cur] {
+			cur, sum = 0, 0
+			if ch != vowel[0] {
+				continue
+			}
+		}
+
+		sum += i - start
+		cur++
+		if cur == 5 {
+			if sum > ans {
+				ans = sum
+			}
+			cur, sum = 0, 0
+		}
+	}
+	return
+}
+
+// 2765  自己想不到这么优雅的写法
+func alternatingSubarray(nums []int) (ans int) {
+	ans = -1
+	n := len(nums)
+	i := 0
+	for i < n-1 {
+		if nums[i+1] != nums[i]+1 {
+			i++
+			continue
+		}
+		start := i
+		i += 2
+		for i < n && nums[i] == nums[i-2] {
+			i++
+		}
+		ans = max(ans, i-start)
+		i--
+	}
+	return ans
+}
+
+// 3255
+func resultsArray(nums []int, k int) []int {
+	n := len(nums)
+	ans := make([]int, n-k+1)
+	for i := range ans {
+		ans[i] = -1
+	}
+	cnt := 0
+	for i, v := range nums {
+		if i == 0 || nums[i-1]+1 == v {
+			cnt++
+		} else {
+			cnt = 1
+		}
+		if cnt >= k {
+			ans[i-k+1] = v
+		}
+	}
+	return ans
+}
+
+// 3350
+func maxIncreasingSubarrays(nums []int) (ans int) {
+	preCnt, cnt := 0, 0
+	for i, v := range nums {
+		cnt++
+		if i == len(nums)-1 || v >= nums[i+1] {
+			// i是严格递增段的末尾
+			ans = max(ans, cnt/2, min(preCnt, cnt))
+			preCnt = cnt
+			cnt = 0
+		}
+	}
+	return ans
+}
+
+// 3349
+func hasIncreasingSubarrays(nums []int, k int) bool {
+	preCnt, cnt := 0, 0
+	for i, v := range nums {
+		cnt++
+		if i == len(nums)-1 || v >= nums[i+1] {
+			// i是严格递增段的末尾
+			if max(cnt/2, min(preCnt, cnt)) >= k {
+				return true
+			}
+			preCnt = cnt
+			cnt = 0
+		}
+	}
+	return false
+}
+
+// 3105
+func longestMonotonicSubarray(nums []int) (ans int) {
+	n := len(nums)
+	ans = 1
+	i := 0
+	for i+1 < n {
+		// 相等的情况排除
+		if nums[i+1] == nums[i] {
+			i++
+			continue
+		}
+		start := i
+		// 定下基调是单调递增还是单调递减
+		inc := nums[i+1] > nums[i]
+		i += 2
+		for i < n && nums[i] != nums[i-1] && nums[i] > nums[i-1] == inc {
+			i++
+		}
+		ans = max(ans, i-start)
+		i--
+	}
+	return ans
+}
+
+// 2948
+func lexicographicallySmallestArray(nums []int, limit int) []int {
+	n := len(nums)
+	ids := make([]int, n)
+	for i := range ids {
+		ids[i] = i
+	}
+	// ids的序号按照 nums中的数字从小到大排序
+	slices.SortFunc(ids, func(i, j int) int {
+		return nums[i] - nums[j]
+	})
+	i := 0
+	ans := make([]int, n)
+	for i < n {
+		start := i
+		i++
+		for i < n && nums[ids[i]]-nums[ids[i-1]] < limit {
+			i++
+		}
+		subIds := slices.Clone(ids[start:i])
+		slices.Sort(subIds)
+		for j, idx := range subIds {
+			ans[idx] = nums[ids[start+j]]
+		}
+	}
+	return ans
+}
+
+// 2222
+func numberOfWays(s string) (ans int64) {
+	totalCnt0 := strings.Count(s, "0")
+	// 左边0的个数
+	cnt0 := 0
+	for i, c := range s {
+		if c == '1' {
+			// 找的是010
+			ans += int64(cnt0) * (int64(totalCnt0 - cnt0))
+		} else {
+			// 找的是101
+			cnt1 := i - cnt0 // 一共左边有i+1个元素  当前这个元素除去之外
+			ans += int64(cnt1) * int64((len(s) - totalCnt0 - cnt1))
+			cnt0++
+		}
+	}
+	return ans
+}
+
+// 2012
+func sumOfBeauties(nums []int) (ans int) {
+	n := len(nums)
+	minSuffix := make([]int, n)
+	minSuffix[n-1] = nums[n-1]
+	for i := n - 2; i >= 0; i-- {
+		minSuffix[i] = min(nums[i], minSuffix[i+1])
+	}
+	preMax := nums[0]
+	for i := 1; i < n-1; i++ {
+		x := nums[i]
+		if x > preMax && x < minSuffix[i+1] {
+			ans += 2
+		} else if x > nums[i-1] && x < nums[i+1] {
+			ans++
+		}
+		preMax = max(preMax, x)
+	}
+	return
+}
+
+// 2998
+func minimumOperationsToMakeEqual(x int, y int) int {
+	memo := map[int]int{}
+	var dfs func(int) int
+	dfs = func(x int) int {
+		if x <= y {
+			return y - x
+		}
+		if v, ok := memo[x]; ok {
+			return v
+		}
+		res := min(
+			x-y,
+			dfs(x/11)+x%11+1,
+			dfs(x/11+1)+11-x%11+1,
+			dfs(x/5)+x%5+1,
+			dfs(x/5+1)+5-x%5+1,
+		)
+		memo[x] = res
+		return res
+	}
+	return dfs(x)
+}
+
+// 2106
+func maxTotalFruits(fruits [][]int, startPos int, k int) int {
+	n := len(fruits)
+	cnt := 0
+	ans := 0
+	// 双指针，left 为窗口左端点，right 为窗口右端点
+	left := 0
+	for right := 0; right < n; right++ {
+		posRight := fruits[right][0]
+		// 如果右端点距离 startPos 超过 k，停止遍历
+		if posRight-startPos > k {
+			break
+		}
+		// 累加当前右端点的水果数量
+		cnt += fruits[right][1]
+		// 不断右移窗口左端点，直至窗口合法
+		for left <= right && (posRight-fruits[left][0])+min(abs(posRight-startPos), abs(fruits[left][0]-startPos)) > k {
+			if fruits[left][0] < startPos {
+				cnt -= fruits[left][1]
+			}
+			left++
+		}
+		// 记录本次局部最优解
+		ans = max(ans, cnt)
+	}
+	return ans
 }
