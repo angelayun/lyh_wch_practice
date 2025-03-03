@@ -6,6 +6,7 @@ import (
 )
 
 func Test_maxVowels(t *testing.T) {
+	// res:=countKConstraintSubstrings()
 	res := shortestBeautifulSubstring("100011001", 3)
 	// res := maximumWhiteTiles([][]int{
 	// 	{1, 5}, {10, 11}, {12, 18}, {20, 25}, {30, 32},

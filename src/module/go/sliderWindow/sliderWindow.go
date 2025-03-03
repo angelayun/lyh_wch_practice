@@ -1061,7 +1061,7 @@ func minWindow(s string, t string) string {
 }
 
 // 1358
-func numberOfSubstrings(s string) (ans int) {
+func numberOfSubstrings_1358(s string) (ans int) {
 	cnt := [3]int{}
 	left := 0
 	for _, c := range s {
@@ -1121,7 +1121,7 @@ func countSubarrays_2962(nums []int, k int) (ans int64) {
 }
 
 // 3325
-func numberOfSubstrings(s string, k int) (ans int) {
+func numberOfSubstrings_3325(s string, k int) (ans int) {
 	cnt := [26]int{}
 	left := 0
 	for _, c := range s {
@@ -1220,7 +1220,7 @@ func numSubarrayProductLessThanK(nums []int, k int) (ans int) {
 }
 
 // 3258
-func countKConstraintSubstrings(s string, k int) (ans int) {
+func countKConstraintSubstrings_3258_a(s string, k int) (ans int) {
 	cnt := [2]int{}
 	left := 0
 	for right, c := range s {
@@ -1288,4 +1288,169 @@ func numSubarraysWithSum(nums []int, goal int) (ans int) {
 		cnt[sum]++
 	}
 	return
+}
+
+// 3258
+func countKConstraintSubstrings_3258(s string, k int) (ans int) {
+	left := 0
+	cnt := [2]int{}
+	for right, c := range s {
+		cnt[c-'0']++
+		for cnt[0] > k && cnt[1] > k {
+			cnt[s[left]-'0']--
+			left++
+		}
+		ans += right - left + 1
+	}
+	return ans
+}
+
+// 3261
+func countKConstraintSubstrings(s string, k int, queries [][]int) []int64 {
+	n := len(s)
+	posLeft := make([]int, n)
+	preSum := make([]int, n+1)
+	l := 0
+	cnt := [2]int{}
+	for r, c := range s {
+		cnt[c-'0']++
+		for cnt[0] > k && cnt[1] > k {
+			cnt[s[l]-'0']--
+			l++
+		}
+		posLeft[r] = l
+		preSum[r+1] = preSum[r] + r - l + 1
+	}
+	m := len(queries)
+	ans := make([]int64, m)
+	fmt.Println(posLeft)
+	for i, q := range queries {
+		l, r := q[0], q[1]
+		// fmt.Println(posLeft[l:r+1], l, sort.SearchInts(posLeft[l:r+1], l))
+		// sort.SearchInts(posLeft[l:r+1], l) 搜索l在posLeft[l:r+1]出现的第一个索引位置
+		j := l + sort.SearchInts(posLeft[l:r+1], l)
+		ans[i] = int64((preSum[r+1] - preSum[j]) + (j-l+1)*(j-l)/2)
+	}
+	return ans
+}
+
+// 3134
+// check_3134 检查满足唯一度不超过 upper 的子数组数量是否不少于 k
+func check_3134(nums []int, upper int, k int) bool {
+	cnt := 0
+	left := 0
+	freq := make(map[int]int)
+	for right, v := range nums {
+		freq[v]++
+		// 当唯一度超过 upper 时，移动左指针
+		for len(freq) > upper {
+			freq[nums[left]]--
+			if freq[nums[left]] == 0 {
+				delete(freq, nums[left])
+			}
+			left++
+		}
+		// 统计满足条件的子数组数量
+		cnt += right - left + 1
+		if cnt >= k {
+			return true
+		}
+	}
+	return false
+}
+
+// medianOfUniquenessArray 计算数组所有子数组的唯一度中位数
+func medianOfUniquenessArray(nums []int) int {
+	n := len(nums)
+	// 总共的子数组个数
+	totalSize := (1 + n) * n / 2
+	k := (totalSize + 1) / 2
+	left, right := 0, n
+	for left < right {
+		mid := left + (right-left)/2
+		if check_3134(nums, mid, k) {
+			right = mid
+		} else {
+			left = mid + 1
+		}
+	}
+	return left
+}
+
+// TODO 看到3439来了
+func abs_2593(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
+func f_2593(s string, k int) (ans int) {
+	for m := 1; m <= 26 && m*k <= len(s); m++ {
+		cnt := [26]int{}
+		check := func() {
+			for i := range cnt {
+				if cnt[i] >= 0 && cnt[i] != k {
+					return
+				}
+			}
+			// 刚好每个字符都等于k
+			ans++
+		}
+		for right, in := range s {
+			cnt[in-'a']++
+			// 刚好包含了k*m个字符  这里用的是if  所以
+			if left := right + 1 - k*m; left >= 0 {
+				check()
+				cnt[s[left]-'a']--
+			}
+		}
+	}
+	return
+}
+
+// 2593
+func countCompleteSubstrings(word string, k int) (ans int) {
+	n := len(word)
+	i := 0
+	for i < n {
+		start := i
+		i++
+		for i < n && abs_2593(int(word[i])-int(word[i-1])) <= 2 {
+			i++
+		}
+		ans += f_2593(word[start:i], k)
+	}
+	return
+}
+
+// 462
+func minMoves2(nums []int) (ans int) {
+	slices.Sort(nums)
+	mid := len(nums) / 2
+	for _, x := range nums {
+		ans += abs_2593(x - nums[mid])
+	}
+	return
+}
+
+// 2602
+func minOperations(nums []int, queries []int) []int64 {
+	slices.Sort(nums)
+	fmt.Println(nums)
+	n := len(nums)
+	sum := make([]int, n+1)
+	for i, v := range nums {
+		sum[i+1] = sum[i] + v
+	}
+	ans := make([]int64, len(queries))
+	for i, q := range queries {
+		j := sort.SearchInts(nums, q)
+		fmt.Println(q, j)
+		// j是开区间
+		left := q*j - sum[j]
+		right := sum[n] - sum[j] - q*(n-j)
+		ans[i] = int64(left + right)
+	}
+	return ans
 }

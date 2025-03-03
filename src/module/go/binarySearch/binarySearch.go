@@ -2,6 +2,8 @@ package binarysearch
 
 import (
 	"fmt"
+	"hash/fnv"
+	"math/bits"
 	"slices"
 	"sort"
 )
@@ -166,16 +168,147 @@ func findTheDistanceValue(arr1 []int, arr2 []int, d int) (ans int) {
 }
 
 // 2389
-func answerQueries(nums []int, queries []int) []int {
+func answerQueries1(nums []int, queries []int) []int {
 	slices.Sort(nums)
-	n:=len(nums)
-	prefix:=make([]int,n+1)
-	for _,v:=nums{
-		prefix[i+1]=prefix[i]+v
+	n := len(nums)
+	prefix := make([]int, n+1)
+	for i, v := range nums {
+		prefix[i+1] = prefix[i] + v
 	}
-	ans :=make([]int,len(queries))
-	for i,v:=range queries{
-		ans[i]= lowerBound(prefix,v)-1
+	ans := make([]int, len(queries))
+	for i, v := range queries {
+		ans[i] = lowerBound(prefix, v) - 1
 	}
 	return ans
 }
+
+// 灵神的思路是直接在nums上做前缀和  然后使用api
+func answerQueries(nums []int, queries []int) []int {
+	sort.Ints(nums)
+	for i := 1; i < len(nums); i++ {
+		nums[i] += nums[i-1]
+	}
+	n := len(queries)
+	ans := make([]int, n)
+	for i, q := range queries {
+		ans[i] = sort.SearchInts(nums, q+1)
+	}
+	return ans
+}
+func f_1170(s string) int {
+	// 返回中 按字典序比较）最小字母的出现频次
+	cnt := make([]int, 26)
+	for _, c := range s {
+		cnt[c-'a']++
+	}
+	for _, v := range cnt {
+		if v != 0 {
+
+			return v
+		}
+	}
+	return 0
+}
+
+// 1170
+func numSmallerByFrequency(queries []string, words []string) []int {
+	qn := len(queries)
+	newQuery := make([]int, qn)
+	for i, v := range queries {
+		newQuery[i] = f_1170(v)
+	}
+	wn := len(words)
+	newWord := make([]int, wn)
+	for i, v := range words {
+		newWord[i] = f_1170(v)
+	}
+	fmt.Println(newQuery)
+	fmt.Println(newWord)
+	slices.Sort((newWord))
+	ans := make([]int, qn)
+	for i, v := range newQuery {
+		// 右边界
+		ans[i] = wn - sort.SearchInts(newWord, v+1)
+	}
+	return ans
+}
+
+// 2563
+// 0 1 4 4 5 7
+// x是0 y最小得是3  最大是6
+// x是1 y最小得是2  最大是5
+// x是4 y最小得是-1 最大是2
+func countFairPairs(nums []int, lower int, upper int) (ans int64) {
+	slices.Sort(nums)
+	for i, x := range nums {
+		r := sort.SearchInts(nums[:i], upper-x+1)
+		l := sort.SearchInts(nums[:i], lower-x)
+		ans += int64(r - l)
+	}
+	return ans
+}
+
+// 2070
+func maximumBeauty(items [][]int, queries []int) []int {
+	// 按照x轴从左到右排序
+	slices.SortFunc(items, func(a, b []int) int {
+		return a[0] - b[0]
+	})
+	n := len(queries)
+	ids := make([]int, n)
+	for i := range ids {
+		ids[i] = i
+	}
+	slices.SortFunc(ids, func(a, b int) int {
+		return queries[a] - queries[b]
+	})
+	ans := make([]int, n)
+	j, maxVal := 0, 0
+	for _, i := range ids {
+		q := queries[i]
+		for j < len(items) && items[j][0] <= q {
+			maxVal = max(maxVal, items[j][1])
+			j++
+		}
+		ans[i] = maxVal
+	}
+	return ans
+}
+// 3453
+func separateSquares(squares [][]int) float64 {
+	// 总面积
+	totArea := 0
+	// 最大的y
+	maxY := 0
+	for _, sq := range squares {
+		l := sq[2]
+		totArea += l * l
+		maxY = max(maxY, sq[1]+l)
+	}
+
+	check := func(y float64) bool {
+		area := 0.
+		for _, sq := range squares {
+			yi := float64(sq[1])
+			if yi < y {
+				l := float64(sq[2])
+				// 求的是正方形
+				area += l * min(y-yi, l)
+			}
+		}
+		return area >= float64(totArea)/2
+	}
+	// 左开右开区间
+	left, right := 0., float64(maxY)
+	for range bits.Len(uint(maxY * 1e5)) {
+		mid := (left + right) / 2
+		if check(mid) {
+			// 还可以再向里面收缩  收缩到一个最小的
+			right = mid
+		} else {
+			left = mid
+		}
+	}
+	return (left + right) / 2 // 区间中点误差小
+}
+// 2226
