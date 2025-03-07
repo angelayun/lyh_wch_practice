@@ -1,6 +1,7 @@
 package sliderwindow
 
 import (
+	"cmp"
 	"fmt"
 	"math"
 	"slices"
@@ -225,7 +226,7 @@ func maxScore(cardPoints []int, k int) (ans int) {
 }
 
 // 1652
-func decrypt(code []int, k int) []int {
+func decrypt1(code []int, k int) []int {
 	n := len(code)
 	res := make([]int, n)
 	if k == 0 {
@@ -257,6 +258,24 @@ func decrypt(code []int, k int) []int {
 		sum -= out
 	}
 	return res
+}
+func decrypt(code []int, k int) []int {
+	n := len(code)
+	r := k + 1
+	if k < 0 {
+		k = -1
+		r = n
+	}
+	sum := 0
+	for i := r - k; i < r; i++ {
+		sum += code[i]
+	}
+	ans := make([]int, n)
+	for i := 0; i < n; i++ {
+		ans[i] = sum
+		sum += code[(r-i)%n] - code[(r-i-k)%n]
+	}
+	return ans
 }
 
 // 3
@@ -1451,6 +1470,89 @@ func minOperations(nums []int, queries []int) []int64 {
 		left := q*j - sum[j]
 		right := sum[n] - sum[j] - q*(n-j)
 		ans[i] = int64(left + right)
+	}
+	return ans
+}
+
+// 2593
+func findScore(nums []int) (ans int64) {
+	n := len(nums)
+	type pair struct{ v, i int }
+	a := make([]pair, n+1)
+	for i, v := range nums {
+		a[i] = pair{v, i}
+	}
+	sort.Slice(a, func(i, j int) bool {
+		a, b := a[i], a[j]
+		return a.v < b.v || a.v == b.v && a.i < b.i
+	})
+	vis := make([]bool, n+2)
+	for _, p := range a {
+		if !vis[p.i] {
+			vis[p.i-1] = true
+			vis[p.i+1] = true
+			ans += int64(p.v)
+		}
+	}
+	return
+}
+func findScore1(nums []int) (ans int64) {
+	n := len(nums)
+	type pair struct{ v, i int }
+	a := make([]pair, n)
+	for i, v := range nums {
+		a[i] = pair{v, i + 1}
+	}
+	/* sort.Slice(a, func(i, j int) bool {
+		a, b := a[i], a[j]
+		return a.v < b.v || a.v == b.v && a.i < b.i
+	}) */
+	slices.SortStableFunc(a, func(a, b pair) int {
+		return cmp.Or(cmp.Compare(a.v, b.v), cmp.Compare(a.i, b.i))
+	})
+	vis := make([]bool, n+2)
+	for _, p := range a {
+		if !vis[p.i] {
+			vis[p.i-1] = true
+			vis[p.i+1] = true
+			ans += int64(p.v)
+		}
+	}
+	return
+}
+// findSubstringInWraproundString 计算字符串 s 中所有在环绕字符串 "abcdefghijklmnopqrstuvwxyz" 里的不同非空子串的数量
+func findSubstringInWraproundString(s string) (ans int) {
+	// 用于记录以每个字母结尾的最长连续子串的长度
+	cnt := make([]int, 26)
+	n := len(s)
+	i:=0
+	for i<n{
+		start:=i
+		i++
+		for i<n && (s[i]-s[i-1]+26)%26==1{
+			i++
+		}
+		size:=i-start
+		if size>cnt[s[start]-'a']{
+			cnt[s[start]-'a']=size
+		}
+	}
+	/* for i := 0; i < n; i++ {
+			// 如果当前字符和前一个字符不是连续环绕的，重置长度
+			if i > 0 && (s[i]-s[i-1]+26)%26 != 1 {
+					length = 0
+			}
+			length++
+			index := int(s[i] - 'a')
+			// 更新以当前字母结尾的最长连续子串长度
+			if length > cnt[index] {
+					cnt[index] = length
+			}
+			fmt.Println(cnt)
+	} */
+	// 累加每个字母结尾的最长连续子串长度，得到不同非空子串的总数
+	for _, v := range cnt {
+			ans += v
 	}
 	return ans
 }
