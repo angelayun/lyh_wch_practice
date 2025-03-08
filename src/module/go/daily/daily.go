@@ -5,6 +5,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 // 3462
@@ -286,4 +287,73 @@ func beautifulSubsets(nums []int, k int) int {
 	}
 	dfs(0)
 	return ans
+}
+
+// 1763
+// longestNiceSubstring 函数用于找到字符串 s 中最长的美好子字符串
+// longestNiceSubstring 函数用于找到字符串 s 中最长的美好子字符串
+func longestNiceSubstring(s string) string {
+	n := len(s)
+	mxLen := 0
+	mxStart := 0
+	// 遍历不同的字母个数限制，从 1 到 26
+	for limit := 1; limit <= 26; limit++ {
+			l, r := 0, 0
+			cnt := 0
+			// 用于记录小写字母和大写字母的出现情况
+			lower, upper := 0, 0
+			// 用于记录小写字母和大写字母的出现次数
+			lowerCnt := make(map[rune]int)
+			upperCnt := make(map[rune]int)
+			for r < n {
+					char := rune(s[r])
+					lowerChar := unicode.ToLower(char)
+					// 如果当前字母第一次出现，增加字母个数
+					if lowerCnt[lowerChar] == 0 && upperCnt[lowerChar] == 0 {
+							cnt++
+					}
+					if unicode.IsLower(char) {
+							pos := int(char - 'a')
+							// if lowerCnt[char] == 0 {
+									lower |= (1 << pos)
+							// }
+							lowerCnt[char]++
+					} else {
+							pos := int(lowerChar - 'a')
+							// if upperCnt[lowerChar] == 0 {
+									upper |= (1 << pos)
+							// }
+							upperCnt[lowerChar]++
+					}
+					r++
+					// 当字母个数超过限制时，移动左指针
+					for cnt > limit {
+							char := rune(s[l])
+							lowerChar := unicode.ToLower(char)
+							if unicode.IsLower(char) {
+									pos := int(char - 'a')
+									lowerCnt[char]--
+									if lowerCnt[char] == 0 {
+											lower ^= (1 << pos)
+									}
+							} else {
+									pos := int(lowerChar - 'a')
+									upperCnt[lowerChar]--
+									if upperCnt[lowerChar] == 0 {
+											upper ^= (1 << pos)
+									}
+							}
+							if lowerCnt[lowerChar] == 0 && upperCnt[lowerChar] == 0 {
+									cnt--
+							}
+							l++
+					}
+					// 如果当前子字符串是美好子字符串且长度更长，更新最长美好子字符串的信息
+					if lower^upper == 0 && r-l > mxLen {
+							mxLen = r - l
+							mxStart = l
+					}
+			}
+	}
+	return s[mxStart : mxStart+mxLen]
 }
