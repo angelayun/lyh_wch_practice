@@ -1520,21 +1520,22 @@ func findScore1(nums []int) (ans int64) {
 	}
 	return
 }
+
 // findSubstringInWraproundString 计算字符串 s 中所有在环绕字符串 "abcdefghijklmnopqrstuvwxyz" 里的不同非空子串的数量
 func findSubstringInWraproundString(s string) (ans int) {
 	// 用于记录以每个字母结尾的最长连续子串的长度
 	cnt := make([]int, 26)
 	n := len(s)
-	i:=0
-	for i<n{
-		start:=i
+	i := 0
+	for i < n {
+		start := i
 		i++
-		for i<n && (s[i]-s[i-1]+26)%26==1{
+		for i < n && (s[i]-s[i-1]+26)%26 == 1 {
 			i++
 		}
-		size:=i-start
-		if size>cnt[s[start]-'a']{
-			cnt[s[start]-'a']=size
+		size := i - start
+		if size > cnt[s[start]-'a'] {
+			cnt[s[start]-'a'] = size
 		}
 	}
 	/* for i := 0; i < n; i++ {
@@ -1552,7 +1553,40 @@ func findSubstringInWraproundString(s string) (ans int) {
 	} */
 	// 累加每个字母结尾的最长连续子串长度，得到不同非空子串的总数
 	for _, v := range cnt {
-			ans += v
+		ans += v
 	}
 	return ans
+}
+
+// 3305
+func check3305(word string, k int) (ans int) {
+	// 元音
+	cnt := map[rune]int{}
+	// 辅音
+	cnt2 := 0
+	left := 0
+	for right, ch := range word {
+		if strings.ContainsRune("aeiou", ch) {
+			cnt[ch]++
+		} else {
+			cnt2++
+		}
+		for left <= right && len(cnt) >= 5 && cnt2 >= k {
+			y := rune(word[left])
+			if strings.ContainsRune("aeiou", y) {
+				cnt[y]--
+				if cnt[y] == 0 {
+					delete(cnt, y)
+				}
+			} else {
+				cnt2--
+			}
+			left++
+		}
+		ans += left
+	}
+	return
+}
+func countOfSubstrings(word string, k int) int {
+	return check3305(word, k) - check3305(word, k+1)
 }

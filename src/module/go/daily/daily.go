@@ -5,6 +5,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"structs"
 	"unicode"
 )
 
@@ -298,62 +299,182 @@ func longestNiceSubstring(s string) string {
 	mxStart := 0
 	// 遍历不同的字母个数限制，从 1 到 26
 	for limit := 1; limit <= 26; limit++ {
-			l, r := 0, 0
-			cnt := 0
-			// 用于记录小写字母和大写字母的出现情况
-			lower, upper := 0, 0
-			// 用于记录小写字母和大写字母的出现次数
-			lowerCnt := make(map[rune]int)
-			upperCnt := make(map[rune]int)
-			for r < n {
-					char := rune(s[r])
-					lowerChar := unicode.ToLower(char)
-					// 如果当前字母第一次出现，增加字母个数
-					if lowerCnt[lowerChar] == 0 && upperCnt[lowerChar] == 0 {
-							cnt++
-					}
-					if unicode.IsLower(char) {
-							pos := int(char - 'a')
-							// if lowerCnt[char] == 0 {
-									lower |= (1 << pos)
-							// }
-							lowerCnt[char]++
-					} else {
-							pos := int(lowerChar - 'a')
-							// if upperCnt[lowerChar] == 0 {
-									upper |= (1 << pos)
-							// }
-							upperCnt[lowerChar]++
-					}
-					r++
-					// 当字母个数超过限制时，移动左指针
-					for cnt > limit {
-							char := rune(s[l])
-							lowerChar := unicode.ToLower(char)
-							if unicode.IsLower(char) {
-									pos := int(char - 'a')
-									lowerCnt[char]--
-									if lowerCnt[char] == 0 {
-											lower ^= (1 << pos)
-									}
-							} else {
-									pos := int(lowerChar - 'a')
-									upperCnt[lowerChar]--
-									if upperCnt[lowerChar] == 0 {
-											upper ^= (1 << pos)
-									}
-							}
-							if lowerCnt[lowerChar] == 0 && upperCnt[lowerChar] == 0 {
-									cnt--
-							}
-							l++
-					}
-					// 如果当前子字符串是美好子字符串且长度更长，更新最长美好子字符串的信息
-					if lower^upper == 0 && r-l > mxLen {
-							mxLen = r - l
-							mxStart = l
-					}
+		l, r := 0, 0
+		cnt := 0
+		// 用于记录小写字母和大写字母的出现情况
+		lower, upper := 0, 0
+		// 用于记录小写字母和大写字母的出现次数
+		lowerCnt := make(map[rune]int)
+		upperCnt := make(map[rune]int)
+		for r < n {
+			char := rune(s[r])
+			lowerChar := unicode.ToLower(char)
+			// 如果当前字母第一次出现，增加字母个数
+			if lowerCnt[lowerChar] == 0 && upperCnt[lowerChar] == 0 {
+				cnt++
 			}
+			if unicode.IsLower(char) {
+				pos := int(char - 'a')
+				// if lowerCnt[char] == 0 {
+				lower |= (1 << pos)
+				// }
+				lowerCnt[char]++
+			} else {
+				pos := int(lowerChar - 'a')
+				// if upperCnt[lowerChar] == 0 {
+				upper |= (1 << pos)
+				// }
+				upperCnt[lowerChar]++
+			}
+			r++
+			// 当字母个数超过限制时，移动左指针
+			for cnt > limit {
+				char := rune(s[l])
+				lowerChar := unicode.ToLower(char)
+				if unicode.IsLower(char) {
+					pos := int(char - 'a')
+					lowerCnt[char]--
+					if lowerCnt[char] == 0 {
+						lower ^= (1 << pos)
+					}
+				} else {
+					pos := int(lowerChar - 'a')
+					upperCnt[lowerChar]--
+					if upperCnt[lowerChar] == 0 {
+						upper ^= (1 << pos)
+					}
+				}
+				if lowerCnt[lowerChar] == 0 && upperCnt[lowerChar] == 0 {
+					cnt--
+				}
+				l++
+			}
+			// 如果当前子字符串是美好子字符串且长度更长，更新最长美好子字符串的信息
+			if lower^upper == 0 && r-l > mxLen {
+				mxLen = r - l
+				mxStart = l
+			}
+		}
 	}
 	return s[mxStart : mxStart+mxLen]
+}
+
+// 3340
+func isBalanced(num string) bool {
+	cnt := [2]int{}
+	for i, x := range num {
+		cnt[i&1] += int(x - '0')
+	}
+	return cnt[0] == cnt[1]
+}
+
+// 3110
+func scoreOfString(s string) (ans int) {
+	for i := 1; i < len(s); i++ {
+		ans += abs(int(s[i]) - int(s[i-1]))
+	}
+	return
+}
+
+// 3483
+func totalNumbers1(digits []int) int {
+	cnt := map[int]bool{}
+	n := len(digits)
+	for i := 0; i < n; i++ {
+		if digits[i] == 0 {
+			continue
+		}
+		for j := 0; j < n; j++ {
+			if j == i {
+				continue
+			}
+			for k := 0; k < n; k++ {
+				if k == j || k == i {
+					continue
+				}
+				cur := digits[i]*100 + digits[j]*10 + digits[k]
+				if cur&1 == 0 {
+					cnt[cur] = true
+				}
+			}
+		}
+	}
+	return len(cnt)
+}
+func totalNumbers(digits []int) int {
+	cnt := map[int]struct{}{}
+	for i, c := range digits {
+		// 个数数不是偶数
+		if c&1 == 1 {
+			continue
+		}
+		for j, b := range digits {
+			// 每个数字只能选择1次
+			if j == i {
+				continue
+			}
+			for k, a := range digits {
+				// 不能有前导0  所以百倍数不能是0
+				if a == 0 || k == i || k == j {
+					continue
+				}
+				cnt[a*100+b*10+c] = struct{}{}
+			}
+		}
+	}
+	return len(cnt)
+}
+
+// 3471
+func largestInteger(nums []int, k int) int {
+	n := len(nums)
+	var fn func([]int, int) int
+	fn = func(nums []int, x int) int {
+		// 判断某个数是否存在数组中
+		if slices.Contains(nums, x) {
+			return -1
+		}
+		return x
+	}
+	if k == n {
+		// 每一个数字都可能是答案  找最大的
+		return slices.Max(nums)
+	} else if k == 1 {
+		// 最大的只出现一次的数字
+		cnt := map[int]int{}
+		for _, x := range nums {
+			cnt[x]++
+		}
+		// 可能会出现没有出现1次的情况 初始值-1
+		ans := -1
+		for x, c := range cnt {
+			if c == 1 && x > ans {
+				ans = x
+			}
+		}
+		return ans
+	} else {
+		return max(fn(nums[1:], nums[0]), fn(nums[:n-1], nums[n-1]))
+	}
+}
+
+// 2614
+func isPrime(x int) bool {
+	for i := 2; i*i <= x; i++ {
+		if x%i == 0 {
+			return false
+		}
+	}
+	return x > 1
+}
+func diagonalPrime(nums [][]int) (ans int) {
+	n := len(nums[0])
+	for i, row := range nums {
+		for j, v := range row {
+			if (i == j || (j == n-i-1)) && v > ans && isPrime(v) {
+				ans = max(ans, v)
+			}
+		}
+	}
+	return
 }

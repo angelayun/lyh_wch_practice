@@ -1,6 +1,9 @@
 package tree
 
-import "math"
+import (
+	"go/types"
+	"math"
+)
 
 type ListNode struct {
 	Val  int
@@ -71,7 +74,54 @@ func mergeNodes(head *ListNode) *ListNode {
 	newHead.Next = nil
 	return head
 }
-// 725
-func splitListToParts(head *ListNode, k int) []*ListNode {
 
+// 1019
+func nextLargerNodes1(head *ListNode) (ans []int) {
+	type pair struct {
+		i int
+		v int
+	}
+	st := []pair{}
+	for cur := head; cur != nil; cur = cur.Next {
+		// 如果栈里面有值的话 并且值比当前元素值小
+		for len(st) > 0 && st[len(st)-1].v < cur.Val {
+			ans[st[len(st)-1].i] = cur.Val
+			st = st[:len(st)-1]
+		}
+		st = append(st, pair{i: len(ans), v: cur.Val})
+		// 先占位
+		ans = append(ans, 0)
+	}
+	return ans
+}
+func reverseList(head *ListNode) (*ListNode, int) {
+	var pre, cur *ListNode = nil, head
+	n := 0
+	for cur != nil {
+		n++
+		next := cur.Next
+		cur.Next = pre
+		pre = cur
+		cur = next
+	}
+	return pre, n
+}
+func nextLargerNodes(head *ListNode) []int {
+	st := []int{}
+	head, n := reverseList(head)
+	ans := make([]int, n)
+	// 从右向左遍历
+	for cur := head; cur != nil; cur = cur.Next {
+		for len(st) > 0 && st[len(st)-1] <= cur.Val {
+			st = st[:len(st)-1]
+		}
+		n--
+		if len(st) > 0 {
+			ans[n] = st[len(st)-1]
+		}
+		st = append(st, cur.Val)
+		// 先占位
+		ans = append(ans, 0)
+	}
+	return ans
 }
