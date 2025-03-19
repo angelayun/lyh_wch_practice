@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"slices"
+	"strings"
 
 	"github.com/emirpasic/gods/v2/trees/redblacktree"
 )
@@ -397,7 +398,152 @@ func maxPoints(points [][]int) (ans int) {
 	}
 	return
 }
+
 // 946
 func validateStackSequences(pushed []int, popped []int) bool {
-    
+	i, j := 0, 0
+	st := []int{}
+	for i < len(pushed) {
+		st = append(st, pushed[i])
+		i++
+		for len(st) > 0 && st[len(st)-1] == popped[j] {
+			j++
+			st = st[:len(st)-1]
+		}
+	}
+	return len(st) == 0
+}
+
+// 3412
+// getMirror 函数用于获取单个小写字母的镜像字母
+func getMirror(char rune) rune {
+	// 检查字符是否为小写字母
+	if char >= 'a' && char <= 'z' {
+		return 'z' - (char - 'a')
+	}
+	// 非小写字母原样返回
+	return char
+}
+
+// calculateScore 函数用于计算字符串的得分
+/* func calculateScore(s string) (ans int64) {
+	// 镜像字母 对应 索引
+	cnt := map[rune][]int{}
+	for i, c := range s {
+		mirror := getMirror(c)
+		if ls, ok := cnt[mirror]; ok {
+			if len(ls) > 0 {
+				j := ls[len(ls)-1]
+				ans += int64(i - j)
+			}
+		}
+		if _, ok := cnt[c]; !ok {
+			cnt[c] = []int{}
+		}
+		cnt[c] = append(cnt[c], i)
+	}
+	return ans
+} */
+func calculateScore1(s string) (ans int64) {
+	st := [26][]int{}
+	for i := range st {
+		st[i] = []int{}
+	}
+	for i, c := range s {
+		idx := c - 'a'
+		if len(st[25-idx]) > 0 {
+			ans += int64(i - st[25-idx][len(st[25-idx])-1])
+			st[25-idx] = st[25-idx][:len(st[25-idx])-1]
+		} else {
+			st[idx] = append(st[idx], i)
+		}
+	}
+	return ans
+}
+func calculateScore(s string) (ans int64) {
+	st := [26][]int{}
+	for i, c := range s {
+		idx := c - 'a'
+		if len(st[25-idx]) > 0 {
+			ans += int64(i - st[25-idx][len(st[25-idx])-1])
+			st[25-idx] = st[25-idx][:len(st[25-idx])-1]
+		} else {
+			st[idx] = append(st[idx], i)
+		}
+	}
+	return ans
+}
+
+// 71
+func simplifyPath(path string) string {
+	var stk []string
+	for _, s := range strings.Split(path, "/") {
+		if s == "." || s == "" {
+			continue
+		} else if s != ".." {
+			stk = append(stk, s)
+		} else if len(stk) > 0 {
+			stk = stk[:len(stk)-1]
+		}
+	}
+	return "/" + strings.Join(stk, "/")
+}
+
+// 3170
+func clearStars(s string) string {
+	st := [26][]int{}
+	deleteIdx := map[int]bool{}
+	for i, c := range s {
+		if c != '*' {
+			idx := c - 'a'
+			st[idx] = append(st[idx], i)
+		} else {
+			deleteIdx[i] = true
+			for i, ls := range st {
+				if len(ls) > 0 {
+					deleteIdx[ls[len(ls)-1]] = true
+					ls = ls[:len(ls)-1]
+					st[i] = ls
+					break
+				}
+			}
+		}
+	}
+	res := []rune{}
+	for i, c := range s {
+		if deleteIdx[i] == false {
+			res = append(res, c)
+		}
+	}
+	return string(res)
+}
+
+// 2589
+func findMinimumTime(tasks [][]int) (ans int) {
+	// 按照右端点从小到大排序
+	slices.SortFunc(tasks, func(x, y []int) int {
+		return x[1] - y[1]
+	})
+	// 因为已经排好序了 最大的值是tasks[len(tasks)-1][1]
+	runing := make([]bool, tasks[len(tasks)-1][1]+1)
+	for _, t := range tasks {
+		start, end, d := t[0], t[1], t[2]
+		// 在这个时间段运行的去掉
+		for _, b := range runing[start : end+1] {
+			if b {
+				d--
+			}
+		}
+		for i := end; d > 0; i-- {
+			// 剩余的 d 填充区间后缀
+			if !runing[i] {
+				// 没有运行的就运行  然后增加答案
+				runing[i] = true
+				d--
+				ans++
+
+			}
+		}
+	}
+	return
 }

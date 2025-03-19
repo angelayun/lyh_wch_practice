@@ -8,7 +8,8 @@ import (
 func Test_minimumCardPickup(t *testing.T) {
 	// res := minimumCardPickup([]int{3, 4, 2, 3, 4, 7})
 	// res := minimumCardPickup([]int{3, 4, 2, 3, 4, 7})
-	res := countBeautifulPairs([]int{11, 21, 12})
+	// res := countBeautifulPairs([]int{11, 21, 12})
+	res:=calculateScore("eockppxdqclkhjgvnw")
 	fmt.Println(res)
 	/* type args struct {
 		cards []int
