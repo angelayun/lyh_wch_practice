@@ -478,3 +478,67 @@ func diagonalPrime(nums [][]int) (ans int) {
 	}
 	return
 }
+
+// 2610
+func findMatrix1(nums []int) [][]int {
+	ans := [][]int{}
+	type pair struct{ v, freq int }
+	// v 及其对应出现的次数
+	cnt := map[int]int{}
+	for _, v := range nums {
+		// cnt = append(cnt, pair{v, 1})
+		cnt[v]++
+	}
+	pairList := []pair{}
+	for v, freq := range cnt {
+		pairList = append(pairList, pair{v, freq})
+	}
+	// 按照出现次数从大到小排序
+	slices.SortFunc(pairList, func(x, y pair) int {
+		return y.freq - x.freq
+	})
+	for len(pairList) > 0 && pairList[0].freq > 0 {
+		ans = append(ans, []int{})
+		for i, p := range pairList {
+			if p.freq > 0 {
+				ans[len(ans)-1] = append(ans[len(ans)-1], p.v)
+				pairList[i].freq--
+			}
+		}
+	}
+	return ans
+}
+func findMatrix2(nums []int) (ans [][]int) {
+	// v 及其对应出现的次数
+	cnt := map[int]int{}
+	for _, v := range nums {
+		cnt[v]++
+	}
+	for len(cnt) > 0 {
+		// 预分配空间
+		row := make([]int, 0, len(cnt))
+		for x := range cnt {
+			row = append(row, x)
+			cnt[x]--
+			if cnt[x] == 0 {
+				// 删除当前正在遍历的元素是安全的
+				delete(cnt, x)
+			}
+		}
+		ans = append(ans, row)
+	}
+	return
+}
+func findMatrix(nums []int) (ans [][]int) {
+	cnt := make([]int, len(nums)+1)
+	for _, x := range nums {
+		c := cnt[x]
+		// 应该新起一行了
+		if c == len(ans) {
+			ans = append(ans, []int{})
+		}
+		ans[c] = append(ans[c], x)
+		cnt[x]++
+	}
+	return ans
+}

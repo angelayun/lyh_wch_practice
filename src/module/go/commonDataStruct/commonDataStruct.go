@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/emirpasic/gods/v2/trees/redblacktree"
@@ -546,4 +547,144 @@ func findMinimumTime(tasks [][]int) (ans int) {
 		}
 	}
 	return
+}
+
+// 2434
+func robotWithString(s string) string {
+	ans := make([]byte, 0, len(s))
+	cnt := [26]int{}
+	for _, c := range s {
+		cnt[c-'a']++
+	}
+	st := []byte{}
+	min := byte(0)
+	for _, c := range s {
+		cnt[c-'a']--
+		for min < 25 && cnt[min] == 0 {
+			min++
+		}
+		st = append(st, byte(c))
+		for len(st) > 0 && st[len(st)-1] <= byte(cnt[min]+'a') {
+			ans = append(ans, st[len(st)-1])
+			st = st[:len(st)-1]
+		}
+	}
+	return string(ans)
+}
+
+// 636
+func exclusiveTime(n int, logs []string) []int {
+	// 哪个函数 在什么时间点开始执行点  内部函数占用的时间
+	type pair struct{ index, timeIndex, innerSum int }
+	ans := make([]int, n)
+	st := []pair{}
+	for _, s := range logs {
+		sv := strings.Split(s, ":")
+		i, curType, ti := sv[0], sv[1], sv[2]
+		ni, _ := strconv.Atoi(i)
+		nti, _ := strconv.Atoi(ti)
+		if curType == "start" {
+			st = append(st, pair{ni, nti, 0})
+		} else {
+			cur := st[len(st)-1]
+			st = st[:len(st)-1]
+			// 计算当前函数的独占时间
+			exclusive := nti - cur.timeIndex + 1 - cur.innerSum
+			ans[cur.index] += exclusive
+			if len(st) > 0 {
+				// 更新栈顶函数的内部占用时间
+				st[len(st)-1].innerSum += nti - cur.timeIndex + 1
+			}
+		}
+	}
+	return ans
+}
+
+// 930
+func numSubarraysWithSum1(nums []int, goal int) (ans int) {
+	n := len(nums)
+	preSum := make([]int, n+1)
+	for i, x := range nums {
+		preSum[i+1] = preSum[i] + x
+	}
+	cnt := map[int]int{}
+	for _, x := range preSum {
+		if freq, ok := cnt[x-goal]; ok {
+			ans += freq
+		}
+		cnt[x]++
+	}
+	return ans
+}
+func numSubarraysWithSum(nums []int, goal int) (ans int) {
+	preSum := 0
+	cnt := map[int]int{0: 1}
+	for _, x := range nums {
+		preSum += x
+		if freq, ok := cnt[preSum-goal]; ok {
+			ans += freq
+		}
+		cnt[preSum]++
+	}
+	return ans
+}
+
+// 560
+func subarraySum(nums []int, k int) (ans int) {
+	cnt := map[int]int{0: 1}
+	preSum := 0
+	for _, x := range nums {
+		preSum += x
+		if freq, ok := cnt[preSum-k]; ok {
+			ans += freq
+		}
+		cnt[preSum]++
+	}
+	return
+}
+
+// 1524
+func numOfSubarrays1(arr []int) (ans int) {
+	n := len(arr)
+	preSum := make([]int, n+1)
+	for i, x := range arr {
+		// 奇数就加1  偶数就加0
+		preSum[i+1] = preSum[i] + x&1
+	}
+	const mod int = 1e9 + 7
+	cnt := map[int]int{}
+	for _, x := range preSum {
+		if freq, ok := cnt[(x&1)^1]; ok {
+			ans += freq
+		}
+		cnt[x%2]++
+	}
+	return ans % mod
+}
+func numOfSubarrays(arr []int) (ans int) {
+	preSum := 0
+	const mod int = 1e9 + 7
+	cnt := map[int]int{0: 1}
+	for _, x := range arr {
+		preSum += x
+		if freq, ok := cnt[(preSum&1)^1]; ok {
+			ans += freq
+		}
+		cnt[preSum%2]++
+	}
+	return ans % mod
+}
+
+// 974
+func subarraysDivByK(nums []int, k int) (ans int) {
+	preSum := 0
+	cnt := make([]int, k)
+	cnt[0] = 1
+	for _, x := range nums {
+		preSum += x
+		preSum = (preSum%k + k) % k
+		ans += cnt[preSum]
+		cnt[preSum]++
+	}
+	return ans
 }
