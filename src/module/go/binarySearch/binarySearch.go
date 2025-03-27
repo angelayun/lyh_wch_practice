@@ -1,8 +1,10 @@
 package binarysearch
 
 import (
+	"container/ring"
 	"fmt"
 	"hash/fnv"
+	"math"
 	"math/bits"
 	"slices"
 	"sort"
@@ -112,7 +114,7 @@ func nextGreatestLetter1(letters []byte, target byte) byte {
 }
 
 // 744
-func nextGreatestLetter(letters []byte, target byte) byte {
+func nextGreatestLetter1(letters []byte, target byte) byte {
 	index := upperBound(letters, target)
 	if index == len(letters) || letters[index] != target {
 		return letters[0]
@@ -274,6 +276,7 @@ func maximumBeauty(items [][]int, queries []int) []int {
 	}
 	return ans
 }
+
 // 3453
 func separateSquares(squares [][]int) float64 {
 	// 总面积
@@ -311,4 +314,195 @@ func separateSquares(squares [][]int) float64 {
 	}
 	return (left + right) / 2 // 区间中点误差小
 }
-// 2226
+func nextGreatestLetter(letters []byte, target byte) byte {
+	index := sort.Search(len(letters), func(i int) bool { return letters[i] > target })
+	if index == len(letters) || letters[index] != target {
+		return letters[0]
+	}
+	return letters[index]
+}
+
+// 3048
+func earliestSecondToMarkIndices(nums []int, changeIndices []int) int {
+	n := len(nums)
+	m := len(changeIndices)
+	if n > m {
+		return -1
+	}
+	lastT := make([]int, n)
+	left := n - 1
+	right := m + 1
+	check := func(mid int) bool {
+		for i := range lastT {
+			lastT[i] = -1
+		}
+		for i := 0; i < mid; i++ {
+			lastT[changeIndices[i]-1] = i
+		}
+		for _, t := range lastT {
+			// 有课程  没有考试时间
+			if t < 0 {
+				return false
+			}
+		}
+		cnt := 0
+		for i := 0; i < mid; i++ {
+			idx := changeIndices[i] - 1
+			if i == lastT[idx] {
+				// 考试
+				if nums[idx] > cnt {
+					// 没有时间复习
+					return false
+				}
+				cnt -= nums[idx]
+			} else {
+				// 留着后面用
+				cnt++
+			}
+		}
+		return true
+	}
+	for left+1 < right {
+		mid := left + ((right - left) >> 1)
+		if check(mid) {
+			right = mid
+		} else {
+			left = mid
+		}
+	}
+	if right > m {
+		return -1
+	}
+	return right
+}
+func repairCars1(ranks []int, cars int) int64 {
+	mn := slices.Min(ranks)
+	left := 0
+	right := mn * cars * cars
+	check := func(mid int) bool {
+		s := 0
+		for _, x := range ranks {
+			s += int(math.Sqrt(float64(mid / x)))
+			if s >= cars {
+				return true
+			}
+		}
+		return false
+	}
+	for left+1 < right {
+		mid := left + ((right - left) >> 1)
+		if check(mid) {
+			right = mid
+		} else {
+			left = mid
+		}
+	}
+	return int64(right)
+}
+func repairCars(ranks []int, cars int) int64 {
+	cnt := [101]int{}
+	mn := ranks[0]
+	for _, r := range ranks {
+		cnt[r]++
+		if r < mn {
+			mn = r
+		}
+	}
+	left := 0
+	right := mn * cars * cars
+	check := func(mid int) bool {
+		s := 0
+		for r := mn; r <= 100 && s < cars; r++ {
+			// 至多循环100次
+			s += int(math.Sqrt(float64(mid/r))) * cnt[r]
+			if s >= cars {
+				return true
+			}
+		}
+		return false
+	}
+	for left+1 < right {
+		mid := left + ((right - left) >> 1)
+		if check(mid) {
+			right = mid
+		} else {
+			left = mid
+		}
+	}
+	return int64(right)
+}
+
+// 2576  第一种写法
+func maxNumOfMarkedIndices1(nums []int) int {
+	n := len(nums)
+	slices.Sort(nums)
+	left := 0
+	// 上取整
+	right := n/2 + 1
+	check := func(k int) bool {
+		for i := 0; i < k; i++ {
+			if nums[i]*2 > nums[n-k+i] {
+				return false
+			}
+		}
+		return true
+	}
+	for left+1 < right {
+		mid := left + ((right - left) >> 1)
+		if check(mid) {
+			left = mid
+		} else {
+			right = mid
+		}
+	}
+	return left * 2
+}
+func maxNumOfMarkedIndices(nums []int) int {
+	n := len(nums)
+	slices.Sort(nums)
+	i := 0
+	for _, x := range nums[(n+1)/2:] {
+		if nums[i]*2 <= x {
+			i++
+		}
+	}
+	return i * 2
+}
+
+// 2982
+func maximumLength(s string) int {
+	n := len(s)
+	groups := [26][]int{}
+	cnt := 0
+	for i, ch := range s {
+		cnt++
+		// 到达最后一个字母 或者 下一个字母跟当前字母不一致
+		if i+1 == n || s[i] != s[i+1] {
+			groups[ch-'a'] = append(groups[ch-'a'], cnt)
+			cnt = 0
+		}
+	}
+	ans := 0
+	for _, a := range groups {
+		if len(a) == 0 {
+			continue
+		}
+		// 从大到小进行排序
+		slices.SortFunc(a, func(x, y int) int {
+			return y - x
+		})
+		// 哨兵节点的作用
+		a = append(a, 0, 0)
+		// 从最长的特殊子串（a[0]）中取三个长度均为 a[0]−2 的特殊子串。
+		// 例如示例 1 的 aaaa 可以取三个 aa
+		// 如果 a[0]=a[1]，那么可以取三个长度均为 a[0]−1 的特殊子串
+		// 如果 a[0]>a[1]，那么可以取三个长度均为 a[1] 的特殊子串：
+		// 从最长中取两个，从次长中取一个  比方说aaa aa
+		// 从最长、次长、第三长的的特殊子串（a[0],a[1],a[2]）中各取一个长为 a[2] 的特殊子串
+		ans = max(ans, a[0]-2, min(a[0]-1, a[1]), a[2])
+	}
+	if ans == 0 {
+		return -1
+	}
+	return ans
+}

@@ -1,16 +1,18 @@
 package daily
 
 import (
+	"fmt"
 	"math"
+	"math/bits"
 	"slices"
 	"strconv"
 	"strings"
-	"structs"
 	"unicode"
 )
 
 // 3462
 func maxSum(grid [][]int, limits []int, k int) (ans int64) {
+	fmt.Println('t')
 	temp := []int{}
 	cmp := func(a, b int) int { return b - a }
 	for i, rows := range grid {
@@ -138,12 +140,7 @@ func maxDifference(s string) int {
 }
 
 // 3443
-func abs(a int) int {
-	if a > 0 {
-		return a
-	}
-	return -a
-}
+
 func maxDistance(s string, k int) (ans int) {
 	cnt := ['X']int{}
 	for _, ch := range s {
@@ -541,4 +538,238 @@ func findMatrix(nums []int) (ans [][]int) {
 		cnt[x]++
 	}
 	return ans
+}
+
+// 2643
+func rowAndMaximumOnes(mat [][]int) []int {
+	ans := make([]int, 2)
+	for i, rows := range mat {
+		cnt := 0
+		for _, col := range rows {
+			cnt += col
+		}
+		if cnt > ans[1] {
+			ans[0] = i
+			ans[1] = cnt
+		}
+	}
+	return ans
+}
+
+// 3492
+func maxContainers(n int, w int, maxWeight int) int {
+	return min(maxWeight/w, n*n)
+}
+
+// 149
+func gcd(a, b int) int {
+	for a != 0 {
+		a, b = b%a, a
+	}
+	return b
+}
+func maxPoints(points [][]int) (ans int) {
+	n := len(points)
+	if n <= 2 {
+		return n
+	}
+	for i := 0; i < n-1; i++ {
+		x1, y1 := points[i][0], points[i][1]
+		res := 0
+		cnt := map[[2]int]int{}
+		for j := i + 1; j < n; j++ {
+			x2, y2 := points[j][0], points[j][1]
+			dx, dy := x2-x1, y2-y1
+			if dx < 0 {
+				dx = -dx
+				dy = -dy
+			} else if dx == 0 {
+				dy = 1
+			} else if dy == 0 {
+				dx = 1
+			}
+			g := gcd(dx, dy)
+			cnt[[2]int{dx / g, dy / g}]++
+			res = max(res, cnt[[2]int{dx / g, dy / g}])
+		}
+		ans = max(ans, res+1)
+	}
+	return
+}
+
+// 2255
+func countPrefixes1(words []string, s string) (ans int) {
+	isPrefix := func(w, s string) bool {
+		i := 0
+		j := 0
+		for i < len(w) && j < len(s) && w[i] == s[j] {
+			i++
+			j++
+		}
+		return i == len(w)
+	}
+	for _, w := range words {
+		if isPrefix(w, s) {
+			ans++
+		}
+	}
+	return
+}
+func countPrefixes(words []string, s string) (ans int) {
+	for _, w := range words {
+		if strings.HasPrefix(s, w) {
+			ans++
+		}
+	}
+	return
+}
+
+// 2711
+func abs1(a int) int {
+	if a > 0 {
+		return a
+	}
+	return -a
+}
+func differenceOfDistinctValues1(grid [][]int) [][]int {
+	m, n := len(grid), len(grid[0])
+	ans := make([][]int, m)
+	set := map[int]struct{}{}
+	for i, rows := range grid {
+		ans[i] = make([]int, n)
+		for j := range rows {
+			// 左上角个数
+			clear(set)
+			ii := i - 1
+			jj := j - 1
+			for ii >= 0 && jj >= 0 {
+				set[grid[ii][jj]] = struct{}{}
+				ii -= 1
+				jj -= 1
+			}
+			sz := len(set)
+			clear(set)
+			ii = i + 1
+			jj = j + 1
+			for ii < m && jj < n {
+				set[grid[ii][jj]] = struct{}{}
+				ii += 1
+				jj += 1
+			}
+			ans[i][j] = abs(sz - len(set))
+		}
+	}
+	return ans
+}
+func abs(a int) int {
+	if a > 0 {
+		return a
+	}
+	return -a
+}
+func differenceOfDistinctValues2(grid [][]int) [][]int {
+	m, n := len(grid), len(grid[0])
+	ans := make([][]int, m)
+	for i := 0; i < m; i++ {
+		ans[i] = make([]int, n)
+	}
+	set := map[int]struct{}{}
+	// 令 k=i-j+n，那么右上角 k=1，左下角 k=m+n-1
+	for k := 1; k < m+n; k++ {
+		minJ := max(0, n-k)
+		maxJ := min(n-1, m-1-k+n)
+		clear(set)
+		for j := minJ; j <= maxJ; j++ {
+			i := k + j - n
+			ans[i][j] = len(set)
+			set[grid[i][j]] = struct{}{}
+		}
+		clear(set)
+		for j := maxJ; j >= minJ; j-- {
+			i := k + j - n
+			ans[i][j] = abs(ans[i][j] - len(set))
+			set[grid[i][j]] = struct{}{}
+		}
+	}
+	return ans
+}
+func differenceOfDistinctValues(grid [][]int) [][]int {
+	m, n := len(grid), len(grid[0])
+	ans := make([][]int, m)
+	for i := 0; i < m; i++ {
+		ans[i] = make([]int, n)
+	}
+
+	// 令 k=i-j+n，那么右上角 k=1，左下角 k=m+n-1
+	for k := 1; k < m+n; k++ {
+		minJ := max(0, n-k)
+		maxJ := min(n-1, m-1-k+n)
+		set := uint(0)
+		for j := minJ; j <= maxJ; j++ {
+			i := k + j - n
+			ans[i][j] = bits.OnesCount(set)
+			set |= 1 << grid[i][j]
+		}
+		set = uint(0)
+		for j := maxJ; j >= minJ; j-- {
+			i := k + j - n
+			ans[i][j] = abs(ans[i][j] - bits.OnesCount(set))
+			set |= 1 << grid[i][j]
+		}
+	}
+	return ans
+}
+
+// 1329
+func diagonalSort(mat [][]int) [][]int {
+	m, n := len(mat), len(mat[0])
+	// 令 k=i-j+n，那么右上角 k=1，左下角 k=m+n-1
+	for k := 1; k < m+n; k++ {
+		minJ := max(0, n-k)
+		maxJ := min(n-1, m-1-k+n)
+		a := []int{}
+		for j := minJ; j <= maxJ; j++ {
+			i := k + j - n
+			a = append(a, mat[i][j])
+		}
+		slices.Sort(a)
+		index := 0
+		for j := minJ; j <= maxJ; j++ {
+			i := k + j - n
+			mat[i][j] = a[index]
+			index++
+		}
+	}
+	return mat
+}
+func sortMatrix(mat [][]int) [][]int {
+	m, n := len(mat), len(mat[0])
+	// 令 k=i-j+n，那么右上角 k=1，左下角 k=m+n-1
+	for k := 1; k < m+n; k++ {
+		minJ := max(0, n-k)
+		maxJ := min(n-1, m-1-k+n)
+		a := []int{}
+		for j := minJ; j <= maxJ; j++ {
+			i := k + j - n
+			a = append(a, mat[i][j])
+		}
+		if minJ > 0 {
+			slices.Sort(a)
+		} else {
+			// slices.SortFunc()
+		}
+		index := 0
+		for j := minJ; j <= maxJ; j++ {
+			i := k + j - n
+			mat[i][j] = a[index]
+			index++
+		}
+	}
+	return mat
+}
+
+// 2829
+func minimumSum(n int, k int) int {
+	m := min(k/2, n)
+	return m*(1+m)/2 + (k+k+n-m-1)*(n-m)/2
 }

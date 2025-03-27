@@ -3,6 +3,7 @@ package tree
 import (
 	"math"
 	"reflect"
+	"slices"
 
 	"go.starlark.net/resolve"
 )
@@ -305,4 +306,90 @@ func lowestCommonAncestor(root, p, q *TreeNode) *TreeNode {
 		return lowestCommonAncestor(root.Right, p, q)
 	}
 	return root
+}
+
+// 437
+func pathSum(root *TreeNode, targetSum int) (ans int) {
+	cnt := map[int]int{0: 1}
+	var dfs func(*TreeNode, int)
+	dfs = func(node *TreeNode, sum int) {
+		if node == nil {
+			return
+		}
+		sum += node.Val
+		ans += cnt[sum-targetSum]
+		cnt[sum]++
+		dfs(node.Left, sum)
+		dfs(node.Right, sum)
+	}
+	dfs(root, 0)
+	return ans
+}
+
+// 523
+func checkSubarraySum1(nums []int, k int) bool {
+	n := len(nums)
+	if n < 2 {
+		return false
+	}
+	cnt := make([]int, k)
+	cnt[0] = -1
+	preSum := 0
+	for i, x := range nums {
+		preSum += x
+		preSum = (preSum%k + k) % k
+		if cnt[preSum] != 0 {
+			if i-cnt[preSum] >= 2 {
+				return true
+			}
+		} else {
+			cnt[preSum] = i
+		}
+	}
+	return false
+}
+
+// 525
+func findMaxLength(nums []int) (ans int) {
+	cnt := map[int]int{}
+	preSum := 0
+	for i, x := range nums {
+		preSum += x & 1
+		preSum &= 1
+		if j, ok := cnt[preSum]; ok {
+			ans = max(ans, j-i)
+		} else {
+
+			cnt[preSum] = i
+		}
+	}
+	return
+}
+
+// 3319
+func kthLargestPerfectSubtree(root *TreeNode, k int) int {
+	hs := []int{}
+	var dfs func(*TreeNode) int
+	dfs = func(node *TreeNode) int {
+		if node == nil {
+			return 0
+		}
+		leftH := dfs(node.Left)
+		rightH := dfs(node.Right)
+		if leftH == -1 || rightH == -1 {
+			return -1
+		}
+		if leftH != rightH {
+			return -1
+		}
+		curH := leftH + 1
+		hs = append(hs, curH)
+		return curH
+	}
+	dfs(root)
+	if k > len(hs) {
+		return -1
+	}
+	slices.SortFunc(hs, func(x, y int) int { return y - x })
+	return hs[k-1]
 }
