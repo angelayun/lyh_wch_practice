@@ -773,3 +773,12 @@ func minimumSum(n int, k int) int {
 	m := min(k/2, n)
 	return m*(1+m)/2 + (k+k+n-m-1)*(n-m)/2
 }
+func minimumCost(s string) (ans int64) {
+	n := len(s)
+	for i := 1; i < n; i++ {
+		if s[i] != s[i-1] {
+			ans += int64(min(i, n-i))
+		}
+	}
+	return ans
+}

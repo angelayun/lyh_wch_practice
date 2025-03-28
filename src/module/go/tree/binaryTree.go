@@ -4,6 +4,8 @@ import (
 	"math"
 	"reflect"
 	"slices"
+	"strconv"
+	"strings"
 
 	"go.starlark.net/resolve"
 )
@@ -309,7 +311,7 @@ func lowestCommonAncestor(root, p, q *TreeNode) *TreeNode {
 }
 
 // 437
-func pathSum(root *TreeNode, targetSum int) (ans int) {
+func pathSum1(root *TreeNode, targetSum int) (ans int) {
 	cnt := map[int]int{0: 1}
 	var dfs func(*TreeNode, int)
 	dfs = func(node *TreeNode, sum int) {
@@ -392,4 +394,134 @@ func kthLargestPerfectSubtree(root *TreeNode, k int) int {
 	}
 	slices.SortFunc(hs, func(x, y int) int { return y - x })
 	return hs[k-1]
+}
+func maxPathSum(root *TreeNode) (ans int) {
+	ans = math.MinInt
+	var dfs func(*TreeNode) int
+	dfs = func(node *TreeNode) int {
+		if node == nil {
+			return 0
+		}
+		leftSum := dfs(node.Left)
+		rightSum := dfs(node.Right)
+		ans = max(ans, leftSum+rightSum+node.Val)
+		return max(leftSum+rightSum, 0) + node.Val
+	}
+	dfs(root)
+	return
+}
+func diameterOfBinaryTree(root *TreeNode) (ans int) {
+	var dfs func(*TreeNode) int
+	dfs = func(node *TreeNode) int {
+		if node == nil {
+			return -1
+		}
+		left := dfs(node.Left) + 1
+		right := dfs(node.Right) + 1
+		ans = max(ans, left+right)
+		return max(right, left)
+	}
+	dfs(root)
+	return
+}
+func amountOfTime1(root *TreeNode, start int) int {
+	fa := map[*TreeNode]*TreeNode{}
+	var dfs func(*TreeNode, *TreeNode)
+	var startNode *TreeNode
+	dfs = func(node *TreeNode, f *TreeNode) {
+		if node == nil {
+			return
+		}
+		// 记录每一个节点的父节点
+		fa[node] = f
+		if node.Val == start {
+			startNode = node
+		}
+		dfs(node.Left, node)
+		dfs(node.Right, node)
+	}
+	dfs(root, nil)
+	var maxDepth func(*TreeNode, *TreeNode) int
+	maxDepth = func(node, from *TreeNode) int {
+		if node == nil {
+			return -1
+		}
+		res := -1
+		if node.Left != from {
+			res = max(res, maxDepth(node.Left, node))
+		}
+		if node.Right != from {
+			res = max(res, maxDepth(node.Right, node))
+		}
+		if fa[node] != from {
+			res = max(res, maxDepth(fa[node], node))
+		}
+		return res + 1
+	}
+	return maxDepth(startNode, startNode)
+}
+func amountOfTime(root *TreeNode, start int) (ans int) {
+	var dfs func(*TreeNode) (int, bool)
+	dfs = func(node *TreeNode) (int, bool) {
+		if node == nil {
+			return -1, false
+		}
+		leftDepth, leftFound := dfs(node.Left)
+		rightDepth, rightFound := dfs(node.Right)
+		leftDepth++
+		rightDepth++
+		if node.Val == start {
+			ans = max(leftDepth, rightDepth)
+			return 1, true
+		}
+		if leftFound || rightFound {
+			ans = max(ans, leftDepth+rightDepth)
+			if leftFound {
+				return leftDepth, true
+			} else {
+				return rightDepth, true
+			}
+		}
+		return max(leftDepth, rightDepth), false
+	}
+	dfs(root)
+	return
+}
+
+func binaryTreePaths(root *TreeNode) (ans []string) {
+	var dfs func(*TreeNode, []string)
+	dfs = func(node *TreeNode, path []string) {
+		if node == nil {
+			return
+		}
+		val := strconv.Itoa(node.Val)
+		path = append(path, val)
+		if node.Left == node.Right {
+			ans = append(ans, strings.Join(path, "->"))
+		}
+		dfs(node.Left, path)
+		dfs(node.Right, path)
+		path = path[:len(path)-1]
+	}
+	dfs(root, []string{})
+	return
+}
+func pathSum(root *TreeNode, targetSum int) (ans [][]int) {
+	path := []int{}
+	var dfs func(*TreeNode, int)
+	dfs = func(node *TreeNode, sum int) {
+		if node == nil {
+			return
+		}
+		path = append(path, node.Val)
+		sum += node.Val
+		if node.Left == node.Right && sum == targetSum {
+			ans = append(ans, slices.Clone(path))
+		}
+		dfs(node.Left, sum)
+		dfs(node.Right, sum)
+		path = path[:len(path)-1]
+	}
+	dfs(root, 0)
+	return
 }

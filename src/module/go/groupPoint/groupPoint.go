@@ -1,5 +1,12 @@
 package grouppoint
 
+import (
+	"math"
+	"math/bits"
+	"slices"
+	"strconv"
+)
+
 func maxPower1(s string) (ans int) {
 	n := len(s)
 	i := 0
@@ -319,18 +326,247 @@ func maxTurbulenceSize(nums []int) (ans int) {
 
 // 228
 func summaryRanges(nums []int) []string {
-	ans =[]string{}
-	for i, n := 0,len(nums); i < n ;{
-		i0:=i
-		for i++; i<n && nums[i]=nums[i-1]+1;i++{
+	ans := []string{}
+	for i, n := 0, len(nums); i < n; {
+		i0 := i
+		for i++; i < n && nums[i] == nums[i-1]+1; i++ {
 		}
-		cnt:=i-i0
-		if cnt>1{
-			ans=append(ans,i0+"-->"+i)
-		} else{
-			ans=append(ans,i0)
+		cnt := i - i0
+		intI0 := strconv.Itoa(nums[i0])
+		if cnt > 1 {
+			ans = append(ans, intI0+"->"+strconv.Itoa(nums[i-1]))
+		} else {
+			ans = append(ans, intI0)
 		}
 	}
 	return ans
+}
 
+func longestAlternatingSubarray(nums []int, threshold int) (ans int) {
+	for i, n := 0, len(nums); i < n; {
+		i0 := i
+		if nums[i0]%2 != 0 || nums[i0] > threshold {
+			i++
+			continue
+		}
+		for i++; i < n && nums[i]%2 != nums[i-1]%2 && nums[i] <= threshold; i++ {
+		}
+		ans = max(ans, i-i0)
+	}
+	return
+}
+func reductionOperations(nums []int) (ans int) {
+	slices.Sort(nums)
+	cnt := 0
+	for i := 1; i < len(nums); i++ {
+		if nums[i] != nums[i-1] {
+			cnt++
+		}
+		ans += cnt
+	}
+	return ans
+}
+func longestMountain(nums []int) (ans int) {
+	for i, n := 0, len(nums); i+1 < n; {
+		i0 := i
+		i++
+		// 先是上升的 如果是下降的就不对
+		if i < n && nums[i] == nums[i-1] || nums[i] < nums[i-1] {
+			continue
+		}
+		for i < n && nums[i] > nums[i-1] {
+			i++
+		}
+		mid := i
+		for i < n && nums[i] != nums[i-1] && nums[i] < nums[i-1] {
+			i++
+		}
+		if mid == i {
+			continue
+		}
+		ans = max(ans, i-i0)
+		i--
+	}
+	return
+}
+func winnerOfGame(colors string) bool {
+	cnt := [2]int{}
+	for i, n := 0, len(colors); i < n; {
+		i0 := i
+		for i++; i < n && colors[i-1] == colors[i]; i++ {
+		}
+		cnt[int(colors[i0]-'A')] += i - i0
+	}
+	return cnt[0] > cnt[1]
+}
+
+// 1759
+func countHomogenous(s string) (ans int) {
+	var mod int = 1e9 + 7
+	calcSize := func(m int) int {
+		return m * (1 + m) / 2 % mod
+	}
+	for i, n := 0, len(s); i < n; {
+		i0 := i
+		for i++; i < n && s[i-1] == s[i]; i++ {
+		}
+		ans = (ans + calcSize(i-i0)) % mod
+	}
+	return
+}
+func canSortArray(nums []int) bool {
+	for i, n := 0, len(nums); i < n; {
+		i0 := i
+		for i++; i < n && bits.OnesCount(uint(nums[i])) == bits.OnesCount(uint(nums[i-1])); i++ {
+		}
+		slices.Sort(nums[i0:i])
+	}
+	return slices.IsSorted(nums)
+}
+func minCost(colors string, neededTime []int) (ans int) {
+	for i, n := 0, len(colors); i < n; {
+		sum := neededTime[i]
+		mx := neededTime[i]
+		for i++; i < n && colors[i] == colors[i-1]; i++ {
+			sum += neededTime[i]
+			mx = max(mx, neededTime[i])
+		}
+		ans += sum - mx
+	}
+	return
+}
+func alternatingSubarray(nums []int) (ans int) {
+	for i, n := 0, len(nums); i < n; {
+		i0 := i
+		i++
+		if nums[i] != nums[i-1]+1 {
+			continue
+		}
+		for i++; i < n && nums[i] == nums[i-2]; i++ {
+
+		}
+		ans = max(ans, i-i0)
+		i -= 1
+	}
+	return
+}
+func resultsArray_garb(nums []int, k int) []int {
+	n := len(nums)
+	ans := make([]int, n-k+1)
+	for i := range ans {
+		ans[i] = -1
+	}
+	if n == 1 && k == 1 {
+		ans[0] = nums[0]
+	}
+	for i := 0; i < n; {
+		i0 := i
+		mx := nums[i0]
+		for i++; i < n && nums[i] == nums[i-1]+1; i++ {
+			mx := max(nums[i], mx)
+			if i-i0 >= k-1 {
+				ans[i-k+1] = mx
+			}
+		}
+	}
+	return ans
+}
+func resultsArray1(nums []int, k int) []int {
+	n := len(nums)
+	ans := make([]int, n-k+1)
+	for i := range ans {
+		ans[i] = -1
+	}
+	for i := 0; i < n; {
+		i0 := i
+		cnt := 0
+		for i++; i < n && nums[i] == nums[i-1]+1; i++ {
+			cnt++
+		}
+		if i-i0 >= k {
+			for end := i - 1; end-k+1 >= 0 && end >= i0; end-- {
+				ans[end-k+1] = nums[end]
+			}
+		}
+	}
+	return ans
+}
+func resultsArray(nums []int, k int) []int {
+	n := len(nums)
+	ans := make([]int, n-k+1)
+	for i := range ans {
+		ans[i] = -1
+	}
+	cnt := 0
+	for i := 0; i < n; i++ {
+		if i == 0 || nums[i] == nums[i-1]+1 {
+			cnt++
+		} else {
+			cnt = 0
+		}
+		if cnt >= k {
+			ans[i-k+1] = nums[i]
+		}
+	}
+	return ans
+}
+func maxIncreasingSubarrays(nums []int) (ans int) {
+	preCnt := 0
+	for i, n := 0, len(nums); i < n; {
+		i0 := i
+		for i++; i < n && nums[i] > nums[i-1]; i++ {
+		}
+		ans = max(ans, min(i-i0, preCnt), i-i0)
+		preCnt = i - i0
+	}
+	return
+}
+func hasIncreasingSubarrays(nums []int, k int) bool {
+	preCnt := math.MinInt
+	for i, n := 0, len(nums); i < n; {
+		i0 := i
+		for i++; i < n && nums[i] > nums[i-1]; i++ {
+		}
+		if max(min(i-i0, preCnt), i-i0) >= k {
+			return true
+		}
+		preCnt = i - i0
+	}
+	return false
+}
+func longestMonotonicSubarray(nums []int) (ans int) {
+	ans = 1
+	for i, n := 0, len(nums); i+1 < n; {
+		i0 := i
+		i++
+		if nums[i] == nums[i-1] {
+			continue
+		}
+		flag := true
+		if nums[i] < nums[i-1] {
+			flag = false
+		}
+		for i++; i < n && ((nums[i] > nums[i-1] && flag) || (!flag && nums[i] < nums[i-1])); i++ {
+		}
+		ans = max(ans, i-i0)
+		i--
+	}
+	return
+}
+func findSubstringInWraproundString(s string) (ans int) {
+	for i, n := 0, len(s); i < n; {
+		i0 := i
+		for i++; i < n && s[i]-'a' == (s[i-1]-'a'+1)%25; i++ {
+		}
+		m := i - i0
+		ans += (m * (m + 1)) / 2
+	}
+	return
+}
+func minimizedStringLength(s string) int {
+	mask := 0
+	for _, ch := range s {
+		mask |= 1 << (ch - 'a')
+	}
+	return bits.OnesCount(uint(mask))
 }
