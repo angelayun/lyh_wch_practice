@@ -782,3 +782,72 @@ func minimumCost(s string) (ans int64) {
 	}
 	return ans
 }
+func longestCycle(edges []int) int {
+	ans := -1
+	curTime := 1
+	visTime := make([]int, len(edges))
+	for x := range edges {
+		startTime := curTime
+		for x != -1 && visTime[x] == 0 {
+			visTime[x] = curTime
+			curTime++
+			x = edges[x]
+		}
+		if x != -1 && visTime[x] >= startTime {
+			ans = max(ans, curTime-visTime[x])
+		}
+	}
+	return ans
+}
+func addSpaces(s string, spaces []int) string {
+	ans := []byte{}
+	j := 0
+	for i, ch := range s {
+		if j < len(spaces) && i == spaces[j] {
+			ans = append(ans, ' ')
+			j++
+		}
+		ans = append(ans, byte(ch))
+	}
+	return string(ans)
+}
+func percentageLetter(s string, letter byte) int {
+	n := len(s)
+	cnt := 0
+	for _, ch := range s {
+		if ch == rune(letter) {
+			cnt++
+		}
+	}
+	return cnt * 100 / n
+}
+func mostPoints(questions [][]int) int64 {
+	n := len(questions)
+	memo := make([]int64, n)
+	var dfs func(int) int64
+	dfs = func(i int) int64 {
+		if i >= n {
+			return 0
+		}
+		remb := &memo[i]
+		if *remb == 0 {
+			q := questions[i]
+			*remb = max(dfs(i+1), dfs(i+q[1]+1)+int64(q[0]))
+		}
+		return *remb
+	}
+	return dfs(0)
+}
+func maximumTripletValue(nums []int) (ans int64) {
+	maxI := 0
+	maxDiff := 0
+	for _, v := range nums {
+		curVal := int64(maxDiff * v)
+		if curVal > ans {
+			ans = curVal
+		}
+		maxDiff = max(maxDiff, maxI-v)
+		maxI = max(maxI, v)
+	}
+	return ans
+}
