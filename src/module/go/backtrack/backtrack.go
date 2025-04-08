@@ -379,3 +379,183 @@ func subsetXORSum(nums []int) (ans int) {
 	dfs(0)
 	return
 }
+
+// 写的这个回溯是有问题的
+/* func largestDivisibleSubset1(nums []int) (ans []int) {
+	slices.Sort(nums)
+	n := len(nums)
+	path := []int{}
+	var dfs func(int)
+	dfs = func(i int) {
+		if i >= n {
+			if len(ans) < len(path) {
+				ans = slices.Clone(path)
+			}
+			return
+		}
+		// 不选
+		dfs(i + 1)
+		// 选
+		if len(path) == 0 || len(path) > 0 && nums[i]%path[len(path)-1] == 0 {
+			path = append(path, nums[i])
+			dfs(i + 1)
+			path = path[:len(path)-1]
+		}
+	}
+	dfs(0)
+	return
+}
+func largestDivisibleSubset(nums []int) (ans []int) {
+	slices.Sort(nums)
+	n := len(nums)
+	path := []int{}
+	var dfs func(int)
+	dfs = func(i int) {
+		if len(ans) < len(path) {
+			ans = slices.Clone(path)
+		}
+		for j := i; j < n; j++ {
+			dfs(j + 1)
+			if len(path) == 0 || len(path) > 0 && nums[j]%path[len(path)-1] == 0 {
+				path = append(path, nums[j])
+				dfs(j + 1)
+				path = path[:len(path)-1]
+			}
+		}
+	}
+	dfs(0)
+	return ans
+} */
+func largestDivisibleSubset111(nums []int) []int {
+	slices.Sort(nums)
+	n := len(nums)
+	from := make([]int, n)
+	for i := range from {
+		from[i] = -1
+	}
+	dp := make([]int, n)
+	maxI := 0
+	for i, x := range nums {
+		for j, y := range nums[:i] {
+			if x%y == 0 && dp[j] > dp[i] {
+				dp[i] = dp[j]
+				from[i] = j
+			}
+		}
+		dp[i]++
+		if dp[i] > dp[maxI] {
+			maxI = i
+		}
+	}
+	path := make([]int, 0, dp[maxI])
+	for i := maxI; i >= 0; i = from[i] {
+		path = append(path, nums[i])
+	}
+	return path
+}
+func largestDivisibleSubset(nums []int) []int {
+	slices.Sort(nums)
+	n := len(nums)
+	dp := make([]int, n)
+	from := make([]int, n)
+	for i := range from {
+		from[i] = -1
+	}
+	maxI := 0
+	for i, x := range nums {
+		for j, y := range nums[:i] {
+			if x%y == 0 && dp[j] > dp[i] {
+				dp[i] = dp[j]
+				from[i] = j
+			}
+		}
+		if dp[i] > dp[maxI] {
+			maxI = i
+		}
+	}
+	path := make([]int, 0, maxI)
+	for i := maxI; i >= 0; i = from[i] {
+		path = append(path, nums[i])
+	}
+	return path
+}
+func canPartition1(nums []int) bool {
+	totalSum := 0
+	for _, v := range nums {
+		totalSum += v
+	}
+	if totalSum%2 != 0 {
+		return false
+	}
+	target := totalSum / 2
+	n := len(nums)
+	// -1表示没有计算过  0 表示false 1表示true
+	memo := make([][]int8, n)
+	for i := range memo {
+		memo[i] = make([]int8, target+1)
+		for j := range memo[i] {
+			memo[i][j] = -1
+		}
+	}
+	var dfs func(int, int) bool
+	dfs = func(i int, sum int) bool {
+		if i < 0 {
+			return sum == 0
+		}
+		p := &memo[i][sum]
+		if *p != -1 {
+			return *p == 1
+		}
+		// 不选
+		res := sum >= nums[i] && dfs(i-1, sum-nums[i]) || dfs(i-1, sum)
+		if res {
+			*p = 1
+		} else {
+			*p = 0
+		}
+		return res
+	}
+	return dfs(n-1, target)
+}
+func canPartition2(nums []int) bool {
+	totalSum := 0
+	for _, v := range nums {
+		totalSum += v
+	}
+	if totalSum%2 != 0 {
+		return false
+	}
+	target := totalSum / 2
+	n := len(nums)
+	dp := make([][]bool, n+1)
+	for i := range dp {
+		dp[i] = make([]bool, target+1)
+	}
+	dp[0][0] = true
+	for i, x := range nums {
+		for sum := 0; sum <= target; sum++ {
+			dp[i+1][sum] = sum >= x && dp[i][sum-x] || dp[i][sum]
+		}
+	}
+	return dp[n][target]
+}
+
+func canPartition(nums []int) bool {
+	totalSum := 0
+	for _, v := range nums {
+		totalSum += v
+	}
+	if totalSum%2 != 0 {
+		return false
+	}
+	target := totalSum / 2
+	// n := len(nums)
+	dp := make([]bool, target+1)
+	dp[0] = true
+	for _, x := range nums {
+		for sum := target; sum >= x; sum-- {
+			dp[sum] = dp[sum-x] || dp[sum]
+		}
+	}
+	return dp[target]
+}
