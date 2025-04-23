@@ -1178,7 +1178,7 @@ func countCompleteSubarrays(nums []int) (ans int) {
 }
 
 // 2537  这个题目第一反应没出来
-func countGood(nums []int, k int) (ans int64) {
+func countGood1(nums []int, k int) (ans int64) {
 	cnt := map[int]int{}
 	left := 0
 	pair := 0
@@ -1589,4 +1589,20 @@ func check3305(word string, k int) (ans int) {
 }
 func countOfSubstrings(word string, k int) int {
 	return check3305(word, k) - check3305(word, k+1)
+}
+func countGood(nums []int, k int) (ans int64) {
+	cnt := map[int]int64{}
+	left := 0
+	var pair int64
+	for _, x := range nums {
+		pair += cnt[x]
+		cnt[x]++
+		for pair >= int64(k) {
+			cnt[nums[left]]--
+			pair-=cnt[nums[left]]
+			left++
+		}
+		ans+=int64(left)
+	}
+	return
 }
