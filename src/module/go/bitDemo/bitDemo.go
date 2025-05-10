@@ -1001,7 +1001,7 @@ func kthCharacter(k int) byte {
 // @param nums 输入的整数数组
 // @param target 目标值
 // @return 最小操作次数，如果无法组合成目标值则返回 -1
-func minOperations(nums []int, target int) int {
+func minOperations222(nums []int, target int) int {
 	// 把nums数组从小到大排序
 	sort.Ints(nums)
 	// 将目标值转换为 big.Int 类型
@@ -1110,7 +1110,7 @@ func calculateScore(instructions []string, values []int) int64 {
 	return int64(ans)
 }
 
-func countSubarrays(nums []int, k int) int {
+func countSubarrays111(nums []int, k int) int {
 	// 找到k所在的位置
 	pos := 0
 	for nums[pos] != k {
@@ -1443,4 +1443,245 @@ func insert(intervals [][]int, newInterval []int) [][]int {
 		}
 	}
 	return ans */
+}
+func checkArray(nums []int, k int) bool {
+	n := len(nums)
+	diffs := make([]int, n+1)
+	sumD := 0
+	for i, x := range nums {
+		sumD += diffs[i]
+		x += sumD
+		if x == 0 {
+			continue
+		}
+		if i+k >= n || x < 0 {
+			return false
+		}
+		sumD += x
+		diffs[i+k] -= x
+	}
+	return true
+}
+func minOperations(nums []int, k int) int {
+	sum := 0
+	for _, x := range nums {
+		sum += x
+	}
+	return sum % k
+}
+
+func canEat(candiesCount []int, queries [][]int) []bool {
+	n := len(queries)
+	m := len(candiesCount)
+	ans := make([]bool, n)
+	sum := make([]int, m+1)
+	for i := 0; i < m; i++ {
+		sum[i+1] = sum[i] + (candiesCount[i])
+	}
+	for i := 0; i < n; i++ {
+		favoriteType, favoriteDay, dailyCap := queries[i][0], queries[i][1], queries[i][2]
+		left := sum[favoriteType] / dailyCap
+		right := sum[favoriteType+1]
+		ans[i] = left <= favoriteDay && favoriteDay < right
+	}
+	return ans
+}
+
+func countInterestingSubarrays111(nums []int, modulo int, k int) (ans int64) {
+	n := len(nums)
+	preSum := make([]int, n+1)
+	for i, x := range nums {
+		preSum[i+1] = preSum[i]
+		if x%modulo == k {
+			preSum[i+1]++
+		}
+	}
+	cnt := make([]int, min(n+1, modulo))
+	for _, s := range preSum {
+		y := s % modulo
+		if y >= k {
+			ans += int64(cnt[(s-k)%modulo])
+		}
+		cnt[y]++
+	}
+	return
+}
+func countInterestingSubarrays2(nums []int, modulo int, k int) (ans int64) {
+	n := len(nums)
+	preSum := make([]int, n+1)
+	for i, x := range nums {
+		preSum[i+1] = preSum[i]
+		if x%modulo == k {
+			preSum[i+1]++
+		}
+	}
+	cnt := make([]int, min(n+1, modulo))
+	for _, s := range preSum {
+		if s >= k {
+			ans += int64(cnt[(s-k)%modulo])
+		}
+		cnt[s%modulo]++
+	}
+	return
+}
+func countInterestingSubarrays(nums []int, modulo int, k int) (ans int64) {
+	n := len(nums)
+	// preSum := make([]int, n+1)
+	// for i, x := range nums {
+	// 	preSum[i+1] = preSum[i]
+	// 	if x%modulo == k {
+	// 		preSum[i+1]++
+	// 	}
+	// }
+	cnt := make([]int, min(n+1, modulo))
+	s := 0
+	for _, x := range nums {
+		if x%modulo == k {
+			s++
+		}
+		if s >= k {
+			ans += int64(cnt[(s-k)%modulo])
+		}
+		cnt[s%modulo]++
+	}
+	return
+}
+func searchInsert(nums []int, target int) int {
+	return sort.SearchInts(nums, target)
+}
+func search1(nums []int, target int) int {
+	index := sort.SearchInts(nums, target)
+	if index == len(nums) || nums[index] != target {
+		return -1
+	}
+	return index
+}
+func search(nums []int, target int) int {
+	index, ok := slices.BinarySearch(nums, target)
+	if ok {
+		return index
+	}
+	return -1
+}
+func nextGreatestLetter(letters []byte, target byte) byte {
+	m := len(letters)
+	index := sort.Search(m, func(i int) bool {
+		return letters[i] > target
+		/* if letters[i] > target {
+			return true
+		}
+		return false */
+	})
+	if index == len(letters) || letters[index] <= target {
+		return letters[0]
+	}
+	return letters[index]
+}
+func countSubarrays222(nums []int) (ans int) {
+	n := len(nums)
+	for i := 1; i < n-1; i++ {
+		sum := nums[i] + nums[i+1]
+		if nums[i]/2 == sum {
+			ans++
+		}
+	}
+	return
+}
+
+/* func numSubarrayBoundedMax(nums []int, left int, right int) (ans int) {
+	i0 := -1
+	maxV := -1
+	maxI := -1
+	for i, x := range nums {
+		maxV = max(x, maxV)
+		if maxV > x {
+			maxI = i
+			maxV = x
+		}
+		if !(x >= left && x <= right) {
+			i0 = i
+		}
+		ans += max(0, maxI-i0)
+	}
+	return
+} */
+
+func numSubarrayBoundedMax222(nums []int, left int, right int) (ans int) {
+	i0, i1 := -1, -1
+	for i, x := range nums {
+		if x > right {
+			i0 = i
+		}
+		if x >= left {
+			i1 = i
+		}
+		ans += i1 - i0
+	}
+	return ans
+}
+func countSubarrays22233(nums []int, K int64) int64 {
+	k := int(K)
+	ans := 0
+	left, sum := 0, 0
+	for right, x := range nums {
+		sum += x
+		for sum*(right-left+1) >= k {
+			sum -= nums[left]
+			left++
+		}
+		ans += right - left + 1
+	}
+	return int64(ans)
+}
+func countSubarrays(nums []int, minK int, maxK int) int64 {
+	ans := 0
+	i0, mnI, mxI := -1, -1, -1
+	for i, x := range nums {
+		if x == minK {
+			mnI = i
+		}
+		if x == maxK {
+			mxI = i
+		}
+		if x < minK || x > maxK {
+			i0 = i
+		}
+		ans += max(0, min(mnI, mxI)-i0)
+	}
+	return int64(ans)
+}
+func numSubarrayBoundedMax(nums []int, left int, right int) (ans int) {
+	i0, i1 := -1, -1
+	for i, x := range nums {
+		if x > right {
+			i0 = i
+		}
+		if x >= left {
+			i1 = i
+		}
+		ans += i1 - i0
+	}
+	return
+}
+func minimumOneBitOperations(n int) (ans int) {
+	for n != 0 {
+		ans ^= n
+		n >>= 1
+	}
+	return
+}
+func carFleet(target int, position []int, speed []int) (ans int) {
+	n := len(position)
+	time := make([]int, n)
+	for i, x := range position {
+		time[i] = (target - x) / speed[i]
+	}
+	st := []int{}
+	for _, t := range time {
+		for len(st) > 0 && t >= st[len(st)-1] {
+			st = st[:len(st)-1]
+		}
+		st = append(st, t)
+	}
+	return len(st)
 }

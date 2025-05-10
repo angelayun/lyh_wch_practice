@@ -1,7 +1,6 @@
 package tree
 
 import (
-	"go/types"
 	"math"
 )
 
@@ -106,7 +105,7 @@ func reverseList(head *ListNode) (*ListNode, int) {
 	}
 	return pre, n
 }
-func nextLargerNodes(head *ListNode) []int {
+func nextLargerNodes123(head *ListNode) []int {
 	st := []int{}
 	head, n := reverseList(head)
 	ans := make([]int, n)
@@ -125,3 +124,75 @@ func nextLargerNodes(head *ListNode) []int {
 	}
 	return ans
 }
+
+func nextLargerNodes12(head *ListNode) (ans []int) {
+	st := []int{}
+	var dfs func(*ListNode, int)
+	dfs = func(node *ListNode, i int) {
+		if node == nil {
+			ans = make([]int, i)
+			return
+		}
+		dfs(node.Next, i+1)
+		for len(st) > 0 && st[len(st)-1] <= node.Val {
+			st = st[:len(st)-1]
+		}
+		if len(st) > 0 {
+			ans[i] = st[len(st)-1]
+		}
+		st = append(st, node.Val)
+	}
+	dfs(head, 0)
+	return
+}
+func find132pattern(nums []int) bool {
+	n := len(nums)
+	prefix := make([]int, n)
+	prefix[0] = nums[0]
+	for i := 1; i < n; i++ {
+		prefix[i] = min(prefix[i-1], nums[i])
+	}
+	st := []int{}
+	for i := n - 1; i > 0; i-- {
+		x := nums[i]
+		if x > prefix[i] {
+			for len(st) > 0 && st[len(st)-1] <= prefix[i] {
+				st = st[:len(st)-1]
+			}
+			if len(st) > 0 && st[len(st)-1] < x {
+				return true
+			}
+			st = append(st, x)
+		}
+	}
+	return false
+}
+func canSeePersonsCount(heights []int) []int {
+	n := len(heights)
+	ans := make([]int, n)
+	st := []int{}
+	for i := n - 1; i >= 0; i-- {
+		for len(st) > 0 && heights[st[len(st)-1]] <= heights[i] {
+			ans[i]++
+			st = st[:len(st)-1]
+		}
+		if len(st) > 0 {
+			ans[i]++
+		}
+		st = append(st, i)
+	}
+	return ans
+}
+func findNumbers(nums []int) (ans int) {
+	for _, x := range nums {
+		shift := 0
+		for ; x > 0; x /= 10 {
+			shift++
+		}
+		if shift&1 == 0 {
+			ans++
+		}
+	}
+	return
+}
+

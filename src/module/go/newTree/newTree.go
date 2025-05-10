@@ -15,6 +15,45 @@ type TreeNode struct {
 	Right *TreeNode
 }
 
+func flatten2(root *TreeNode) {
+	var head *TreeNode
+	var dfs func(*TreeNode)
+	dfs = func(node *TreeNode) {
+		if node == nil {
+			return
+		}
+		dfs(node.Right)
+		dfs(node.Left)
+		node.Left = nil
+		node.Right = head
+		head = node
+	}
+	dfs(root)
+}
+func flatten(root *TreeNode) {
+	var dfs func(*TreeNode) *TreeNode
+	dfs = func(node *TreeNode) *TreeNode {
+		if node == nil {
+			return nil
+		}
+		leftTails := dfs(node.Left)
+		rightTails := dfs(node.Right)
+		if leftTails != nil {
+			leftTails.Right = node.Right
+			node.Right = node.Left
+			node.Left = nil
+		}
+		if rightTails != nil {
+			return rightTails
+		}
+		if leftTails != nil {
+			return leftTails
+
+		}
+		return node
+	}
+	dfs(root)
+}
 func findSecondMinimumValue(root *TreeNode) (ans int) {
 	minVal := root.Val
 	ans = -1

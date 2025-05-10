@@ -100,4 +100,165 @@ func isCousins(root *TreeNode, x int, y int) (ans bool) {
 	dfs(root, nil, 1)
 	return
 }
-//
+
+func mctFromLeafValues(arr []int) (ans int) {
+	// 放一个哨兵节点
+	st := []int{math.MaxInt32}
+	for _, x := range arr {
+		// 以示例1来看  4>=2  所以2要弹出来
+		for len(st) > 1 && x >= st[len(st)-1] {
+			mid := st[len(st)-1]
+			st = st[:len(st)-1]
+			// mid为2 它应该跟栈顶6 和要入栈的4 这俩中的最小值结合
+			ans += mid * min(x, st[len(st)-1])
+		}
+		st = append(st, x)
+	}
+	for len(st) > 2 {
+		mid := st[len(st)-1]
+		st = st[:len(st)-1]
+		ans += mid * st[len(st)-1]
+	}
+	return ans
+}
+
+func sumSubarrayMins22(arr []int) (ans int) {
+	arr = append(arr, -1)
+	st := []int{-1} // 哨兵
+	for r, x := range arr {
+		for len(st) > 1 && arr[st[len(st)-1]] >= x {
+			i := st[len(st)-1]
+			st = st[:len(st)-1]
+			ans += arr[i] * (i - st[len(st)-1]) * (r - i) // 累加贡献
+		}
+		st = append(st, r)
+	}
+	return ans % (1e9 + 7)
+}
+func sumSubarrayMins(arr []int) (ans int) {
+	n := len(arr)
+	// 左边界 left[i] 为左侧严格小于 arr[i] 的最近元素位置（不存在时为 -1）
+	left := make([]int, n)
+	// 右边界 right[i] 为右侧小于等于 arr[i] 的最近元素位置（不存在时为 n）
+	right := make([]int, n)
+	for i := range right {
+		right[i] = n
+	}
+	st := []int{-1} // 方便赋值 left
+	for i, x := range arr {
+		for len(st) > 1 && arr[st[len(st)-1]] >= x {
+			j := st[len(st)-1]
+			st = st[:len(st)-1] // 移除无用数据
+			right[j] = i
+		}
+		left[i] = st[len(st)-1]
+		st = append(st, i)
+	}
+	for i, x := range arr {
+		ans += x * (i - left[i]) * (right[i] - i) // 累加贡献
+	}
+	return ans % (1e9 + 7)
+}
+func solve(nums []int) int64 {
+	nums = append(nums, math.MaxInt)
+	ans := 0
+	st := []int{-1}
+	for r, v := range nums {
+		for len(st) > 1 && nums[st[len(st)-1]] <= v {
+			i := st[len(st)-1]
+			st = st[:len(st)-1]
+			ans += (i - st[len(st)-1]) * (r - i) * (nums[i])
+		}
+		st = append(st, r)
+	}
+	return int64(ans)
+}
+func subArrayRanges(nums []int) int64 {
+	ans := solve(nums)
+	for i, v := range nums { // 小技巧：所有元素取反后算的就是最小值的贡献
+		nums[i] = -v
+	}
+	return ans + solve(nums)
+}
+
+func maxSumMinProduct(nums []int) (ans int) {
+	n := len(nums)
+	preSum := make([]int, n+1)
+	for i, x := range nums {
+		preSum[i+1] = preSum[i] + x
+	}
+	nums = append(nums, -1)
+	st := []int{-1}
+	for r, x := range nums {
+		for len(st) > 1 && nums[st[len(st)-1]] <= x {
+			i := st[len(st)-1]
+			st = st[:len(st)-1]
+			ans += nums[i] * (preSum[r] - preSum[st[len(st)-1]+1])
+		}
+		st = append(st, r)
+	}
+	return ans % (1e9 + 7)
+}
+func longestSubarray(nums []int) (ans int) {
+	left := 0
+	cnt := [2]int{}
+	for right, x := range nums {
+		cnt[x]++
+		if cnt[x] > 0 {
+			cnt[nums[left]]--
+			left++
+		}
+		ans = max(ans, right-left+1)
+	}
+	return
+}
+
+func numEquivDominoPairs(dominoes [][]int) (ans int) {
+	type pair struct{ a, b int }
+	cnt := map[pair]int{}
+	for _, item := range dominoes {
+		a, b := item[0], item[1]
+		cur := pair{a, b}
+		ans += cnt[cur]
+		cnt[cur]++
+		reverse := pair{b, a}
+		cnt[reverse]++
+	}
+	return
+}
+func maxProduct(n int) int {
+	mx, subMx := math.MinInt, math.MinInt
+	for ; n > 0; n /= 10 {
+		x := n % 10
+		if x > mx {
+			subMx = mx
+			mx = x
+		} else if x > subMx {
+			subMx = x
+		}
+	}
+	return mx * subMx
+}
+func specialGrid(n int) [][]int {
+	ans := make([][]int, 1<<n)
+	for i := range ans {
+		ans[i] = make([]int, 1<<n)
+	}
+	val := 0
+	var dfs func([][]int, int, int)
+	dfs = func(a [][]int, l, r int) {
+		// 左闭右开区间
+		if len(a) == 1 {
+			a[0][l] = val
+			val++
+			return
+		}
+		m := len(a) / 2
+		dfs(a[:m], l+m, r)
+		dfs(a[m:], l+m, r)
+		dfs(a[m:], l, l+m)
+		dfs(a[:m], l, l+m)
+	}
+	dfs(ans, 0, 1<<n)
+	return ans
+}

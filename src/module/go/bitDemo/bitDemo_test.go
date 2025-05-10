@@ -13,7 +13,10 @@ func Test_binaryGap(t *testing.T) {
 		{8, 10},
 		{12, 16},
 	}, []int{4, 8}) */
-	res := insert([][]int{{1, 5}}, []int{2, 7})
+	// res := insert([][]int{{1, 5}}, []int{2, 7})
+	// res := numSubarrayBoundedMax([]int{2, 1, 4, 3}, 2, 3)
+	res := numSubarrayBoundedMax([]int{2, 9, 2, 5, 6}, 2, 8)
+
 	// res := insert([][]int{{1, 3}, {6, 9}}, []int{2, 5})
 	// res:=countLargestGroup(13)
 	// res := carPooling([][]int{{2, 1, 5}, {3, 3, 7}}, 4)
