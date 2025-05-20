@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"slices"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -1246,4 +1247,113 @@ func lcaDeepestLeaves(root *TreeNode) *TreeNode {
 	}
 	_, lca := dfs(root)
 	return lca
+}
+
+func closestNodes111(root *TreeNode, queries []int) [][]int {
+	nums := []int{}
+	var dfs func(*TreeNode)
+	dfs = func(node *TreeNode) {
+		if node == nil {
+			return
+		}
+		dfs(node.Left)
+		nums = append(nums, node.Val)
+		dfs(node.Right)
+	}
+	dfs(root)
+	n := len(nums)
+	m := len(queries)
+	ans := make([][]int, m)
+	fmt.Println(nums)
+	for i, q := range queries {
+		index := sort.SearchInts(nums, q)
+		fmt.Println(q, index)
+		ans[i] = []int{}
+		if index >= n {
+			ans[i] = append(ans[i], -1)
+			if index-1 < n && nums[index-1] <= q {
+				ans[i] = append(ans[i], index-1)
+			} else {
+				ans[i] = append(ans[i], -1)
+			}
+		} else {
+			if nums[index] == q {
+				ans[i] = append(ans[i], nums[index])
+				ans[i] = append(ans[i], nums[index])
+			} else {
+				if index > 0 {
+					ans[i] = append(ans[i], nums[index-1])
+				} else {
+					ans[i] = append(ans[i], -1)
+				}
+				ans[i] = append(ans[i], nums[index])
+			}
+		}
+	}
+	return ans
+}
+func closestNodes222(root *TreeNode, queries []int) [][]int {
+	nums := []int{}
+	var dfs func(*TreeNode)
+	dfs = func(node *TreeNode) {
+		if node == nil {
+			return
+		}
+		dfs(node.Left)
+		nums = append(nums, node.Val)
+		dfs(node.Right)
+	}
+	dfs(root)
+	n := len(nums)
+	m := len(queries)
+	ans := make([][]int, m)
+	for i, q := range queries {
+		mn, mx := -1, -1
+		index, ok := slices.BinarySearch(nums, q)
+		if index < n {
+			// 即便没有找到 只要在范围内  那这个值就是大于等于的值
+			mx = nums[index]
+		}
+		if !ok {
+			// 没有找到 看前面一个值 前面一个值必定是小于等于的
+			index--
+		}
+		if index >= 0 {
+			mn = nums[index]
+		}
+		ans[i] = []int{mn, mx}
+	}
+	return ans
+}
+
+func closestNodes(root *TreeNode, queries []int) [][]int {
+	nums := []int{}
+	var dfs func(*TreeNode)
+	dfs = func(node *TreeNode) {
+		if node == nil {
+			return
+		}
+		dfs(node.Left)
+		nums = append(nums, node.Val)
+		dfs(node.Right)
+	}
+	dfs(root)
+	n := len(nums)
+	m := len(queries)
+	ans := make([][]int, m)
+	for i, q := range queries {
+		mx, mn := -1, -1
+		j, ok := slices.BinarySearch(nums, q)
+		if j < n {
+			mx = nums[j]
+		}
+		if !ok {
+			j--
+		}
+		if j > 0 {
+			mn = nums[j]
+		}
+		ans[i] = []int{mn, mx}
+	}
+	return ans
 }
