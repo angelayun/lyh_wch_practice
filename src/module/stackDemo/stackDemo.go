@@ -264,3 +264,52 @@ func clearStars(s string) string {
 	}
 	return string(ans)
 }
+
+func exclusiveTime(n int, logs []string) []int {
+	// 哪个函数 在什么时间点开始执行点  内部函数占用的时间
+	type pair struct{ index, timeIndex, innerSum int }
+	ans := make([]int, n)
+	st := []pair{}
+	for _, s := range logs {
+		sv := strings.Split(s, ":")
+		i, curType, ti := sv[0], sv[1], sv[2]
+		ni, _ := strconv.Atoi(i)
+		nti, _ := strconv.Atoi(ti)
+		if curType == "start" {
+			st = append(st, pair{ni, nti, 0})
+		} else {
+			cur := st[len(st)-1]
+			st = st[:len(st)-1]
+			// 计算当前函数的独占时间
+			exclusive := nti - cur.timeIndex + 1 - cur.innerSum
+			ans[cur.index] += exclusive
+			if len(st) > 0 {
+				// 更新栈顶函数的内部占用时间
+				st[len(st)-1].innerSum += nti - cur.timeIndex + 1
+			}
+		}
+	}
+	return ans
+}
+
+func robotWithString(s string) string {
+	cnt := [26]int{}
+	for _, ch := range s {
+		cnt[ch-'a']++
+	}
+	st := []byte{}
+	ans := []byte{}
+	min := byte(0)
+	for _, c := range s {
+		cnt[c-'a']--
+		for min < 26 && cnt[min] != 0 {
+			min++
+		}
+		st = append(st, byte(c))
+		for len(st) > 0 && st[len(st)-1]-'a' <= min {
+			ans = append(ans, st[len(st)-1])
+			st = st[:len(st)-1]
+		}
+	}
+	return string(ans)
+}
