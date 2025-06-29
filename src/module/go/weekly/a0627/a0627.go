@@ -1,7 +1,9 @@
 package a0627
 
 import (
+	"cmp"
 	"fmt"
+	"math"
 	"slices"
 	"sort"
 )
@@ -350,7 +352,7 @@ func countFairPairs123(nums []int, lower int, upper int) int64 {
 	}
 	return int64(ans)
 }
-func maxSubsequence(nums []int, k int) []int {
+func maxSubsequence22(nums []int, k int) []int {
 	n := len(nums)
 	idx := make([]int, n)
 	for i := range idx {
@@ -522,4 +524,461 @@ func maximumBeauty(items [][]int, queries []int) []int {
 		ans[i] = maxBeauty
 	}
 	return ans
+}
+
+func minAbsoluteSumDiff(nums1 []int, nums2 []int) int {
+	n := len(nums1)
+	const mod = 1_000_000_007
+	ans, drop := 0, 0
+	copyNums1 := append([]int{}, nums1...)
+	slices.Sort(copyNums1)
+	for i, x := range nums2 {
+		val := abs(x - nums1[i])
+		ans += val
+		j := sort.SearchInts(copyNums1, x)
+		if j < n {
+			drop = max(drop, val-abs(x-copyNums1[j]))
+		}
+		if j > 0 {
+			drop = max(drop, val-abs(x-copyNums1[j-1]))
+		}
+	}
+	return (ans - drop) % mod
+}
+func minAbsoluteSumDiff2333(nums1 []int, nums2 []int) int {
+	const mod = 1_000_000_007
+	n := len(nums1)
+	copyNums1 := append([]int{}, nums1...)
+	slices.Sort(nums1)
+	ans := 0
+	drop := 0
+	for i, x := range nums2 {
+		val := abs(x - nums1[i])
+		ans = (ans + val) % mod
+		j := sort.SearchInts(copyNums1, x)
+		if j < n {
+			drop = max(drop, val-abs(x-copyNums1[j]))
+		}
+		if j > 0 {
+			drop = max(drop, val-abs(x-copyNums1[j-1]))
+		}
+	}
+	return (ans - drop) % mod
+}
+func findClosestElements(arr []int, k int, x int) []int {
+	slices.SortFunc(arr, func(a, b int) int {
+		return cmp.Or(cmp.Compare(abs(a-x), abs(b-x)), cmp.Compare(a, b))
+	})
+	ans := arr[:k]
+	slices.Sort(ans)
+	return ans
+}
+
+func getTriggerTime(increase [][]int, requirements [][]int) []int {
+	n := len(increase)
+	a0, a1, a2 := []int{0}, []int{0}, []int{0}
+	for i, x := range increase {
+		a0 = append(a0, x[0]+a0[i])
+		a1 = append(a1, x[1]+a1[i])
+		a2 = append(a2, x[2]+a2[i])
+	}
+	ans := []int{}
+	for _, re := range requirements {
+		i, j, k := sort.SearchInts(a0, re[0]), sort.SearchInts(a1, re[1]), sort.SearchInts(a2, re[2])
+		if i <= n && j <= n && k <= n {
+			ans = append(ans, max(i, j, k))
+		} else {
+			ans = append(ans, -1)
+		}
+	}
+	return ans
+}
+
+func minimumTime111(time []int, totalTrips int) int64 {
+	mn := slices.Min(time)
+	left, right := mn-1, totalTrips/mn+1
+	check := func(mid int) bool {
+		// mid表示时间上限
+		cnt := 0
+		for _, x := range time {
+			cnt += mid / x
+		}
+		return cnt >= totalTrips
+	}
+	for left+1 < right {
+		mid := left + ((right - left) >> 1)
+		if check(mid) {
+			right = mid
+		} else {
+			left = mid
+		}
+	}
+	return int64(right)
+}
+
+func shipWithinDays111(weights []int, days int) int {
+	sum, mx := 0, math.MinInt
+	for _, w := range weights {
+		sum += w
+		mx = max(mx, w)
+	}
+	left, right := mx-1, sum
+	check := func(mid int) bool {
+
+		// mid当前一趟的运载能力
+		cnt := 1
+		s := mid
+		for _, x := range weights {
+			if s < x {
+				cnt++
+				s = mid
+			}
+			s -= x
+		}
+		return cnt <= days
+	}
+	for left+1 < right {
+		mid := left + ((right - left) >> 1)
+		if check(mid) {
+			right = mid
+		} else {
+			left = mid
+		}
+	}
+	return right
+}
+
+func smallestDivisor(nums []int, threshold int) int {
+	left, right := 0, slices.Max(nums)
+	check := func(mid int) bool {
+		// mid 当前除数
+		sum := 0
+		for _, x := range nums {
+			// 上取整
+			sum += (x + mid - 1) / mid
+			if sum > threshold {
+				return false
+			}
+		}
+		return true
+	}
+	for left+1 < right {
+		mid := left + ((right - left) >> 1)
+		if check(mid) {
+			right = mid
+		} else {
+			left = mid
+		}
+	}
+	return right
+}
+func minimumTime(time []int, totalTrips int) int64 {
+	left, right := 0, slices.Min(time)*totalTrips
+	check := func(mid int) bool {
+		// mid 当前时间
+		sum := 0
+		for _, x := range time {
+			sum += mid / x
+			if sum > totalTrips {
+				return true
+			}
+		}
+		return false
+	}
+	for left+1 < right {
+		mid := left + ((right - left) >> 1)
+		if check(mid) {
+			right = mid
+		} else {
+			left = mid
+		}
+	}
+	return int64(right)
+}
+func shipWithinDays(weights []int, days int) int {
+	mx := math.MinInt
+	sum := 0
+	for _, x := range weights {
+		sum += x
+		if x > mx {
+			mx = x
+		}
+	}
+	left, right := mx-1, sum
+	check := func(mid int) bool {
+		// mid 当前一趟可运载的重量
+		s := mid
+		cnt := 1
+		for _, x := range weights {
+			if s < x {
+				s = mid
+				cnt++
+				if cnt > days {
+					return false
+				}
+			}
+			s -= x
+		}
+		return true
+	}
+	for left+1 < right {
+		mid := left + ((right - left) >> 1)
+		if check(mid) {
+			right = mid
+		} else {
+			left = mid
+		}
+	}
+	return (right)
+}
+func minEatingSpeed(piles []int, h int) int {
+	sum := 0
+	for _, x := range piles {
+		sum += x
+	}
+	left, right := 0, sum
+	check := func(mid int) bool {
+		// mid 当前吃香蕉的速度
+		s := 0
+		for _, x := range piles {
+			s += (mid + x - 1) / mid
+			if s > h {
+				return false
+			}
+		}
+		return true
+	}
+	for left+1 < right {
+		mid := left + ((right - left) >> 1)
+		if check(mid) {
+			right = mid
+		} else {
+			left = mid
+		}
+	}
+	return (right)
+}
+func abs(a int) int {
+	if a < 0 {
+		return -a
+	}
+	return a
+}
+func findRadius(houses []int, heaters []int) int {
+	slices.Sort(houses)
+	slices.Sort(heaters)
+	left, right := -1, max(heaters[len(heaters)-1]-houses[0], houses[len(houses)-1]-heaters[0])
+	check := func(mid int) bool {
+		// 双指针法：i指向房屋，j指向供暖器
+		i, j := 0, 0
+		n, m := len(houses), len(heaters)
+
+		for i < n && j < m {
+			// 如果当前供暖器无法覆盖当前房屋，移动到下一个供暖器
+			if abs(houses[i]-heaters[j]) <= mid {
+				// 当前房屋被覆盖，检查下一个房屋
+				i++
+			} else {
+				// 如果当前供暖器无法覆盖当前房屋，移动到下一个供暖器
+				j++
+			}
+		}
+		return true
+	}
+	for left+1 < right {
+		mid := left + ((right - left) >> 1)
+		if check(mid) {
+			right = mid
+		} else {
+			left = mid
+		}
+	}
+	return (right)
+}
+func repairCars(ranks []int, cars int) int64 {
+	mn := slices.Min(ranks)
+	left, right := 0, mn*cars*cars
+	check := func(mid int) bool {
+		// mid 当时花的时间
+		s := 0
+		for _, x := range ranks {
+			s += int(math.Sqrt(float64(mid / x)))
+			if s >= cars {
+				return true
+			}
+		}
+		return false
+	}
+	for left+1 < right {
+		mid := left + ((right - left) >> 1)
+		if check(mid) {
+			right = mid
+		} else {
+			left = mid
+		}
+	}
+	return int64(right)
+}
+func minDays(bloomDay []int, m int, k int) int {
+	n := len(bloomDay)
+	if m*k > n {
+		return -1
+	}
+	left, right := slices.Min(bloomDay)-1, slices.Max(bloomDay)
+	check := func(mid int) bool {
+		// mid 当前等待的时间
+		cnt := 0
+		tmp := 0
+		for _, x := range bloomDay {
+			if x <= mid {
+				tmp++
+			}
+			if tmp >= k {
+				cnt++
+				tmp = 0
+			}
+		}
+		return cnt >= m
+	}
+	for left+1 < right {
+		mid := left + ((right - left) >> 1)
+		if check(mid) {
+			right = mid
+		} else {
+			left = mid
+		}
+	}
+	return right
+}
+func earliestSecondToMarkIndices222(nums []int, changeIndices []int) int {
+	n, m := len(nums), len(changeIndices)
+	if n > m {
+		return -1
+	}
+	left, right := n-1, m
+	lastT := make([]int, n)
+	check := func(mid int) bool {
+		// mid 最后考试的索引
+		for i := range lastT {
+			lastT[i] = -1
+		}
+		for i, x := range changeIndices[:mid] {
+			lastT[x-1] = i
+		}
+		for _, x := range lastT {
+			if x < 0 {
+				return false
+			}
+		}
+		cnt := 0
+		for i, x := range changeIndices[:mid] {
+			idx := x - 1
+			if lastT[idx] == i {
+				if nums[idx] > cnt {
+					return false
+				}
+				cnt -= nums[idx]
+			} else {
+				cnt++
+			}
+		}
+		return true
+	}
+	for left+1 < right {
+		mid := left + ((right - left) >> 1)
+		if check(mid) {
+			right = mid
+		} else {
+			left = mid
+		}
+	}
+	if right > m {
+		return -1
+	}
+	return right
+}
+func earliestSecondToMarkIndices(nums []int, changeIndices []int) int {
+	n, m := len(nums), len(changeIndices)
+	if n > m {
+		return -1
+	}
+	left, right := n-1, m+1
+	lastT := make([]int, n)
+	check := func(mid int) bool {
+		// mid 最大索引位置
+		for i := range lastT {
+			lastT[i] = -1
+		}
+		for i, x := range lastT[:mid] {
+			lastT[x-1] = i
+		}
+		for i := range lastT {
+			if lastT[i] < 0 {
+				return false
+			}
+		}
+		cnt := 0
+		for i, x := range changeIndices[:mid] {
+			idx := x - 1
+			if lastT[idx] == i {
+				if nums[i] > cnt {
+					return false
+				}
+				cnt -= nums[i]
+			} else {
+				cnt++
+			}
+		}
+		return true
+	}
+	for left+1 < right {
+		mid := left + ((right - left) >> 1)
+		if check(mid) {
+			right = mid
+		} else {
+			left = mid
+		}
+	}
+	if right > m {
+		return -1
+	}
+	return right
+}
+func maxSubsequence(nums []int, k int) []int {
+	n := len(nums)
+	idx := make([]int, n)
+	for i := range idx {
+		idx[i] = i
+	}
+	// 从大到小排序
+	slices.SortFunc(idx, func(i, j int) int { return nums[j] - nums[i] })
+	idx = idx[:k]
+	slices.Sort(idx)
+	for i, j := range idx {
+		idx[i] = nums[j]
+	}
+	return idx
+}
+func hIndex(citations []int) int {
+	n := len(citations)
+	left, right := 0, citations[n-1]+1
+	check := func(mid int) bool {
+		cnt := 0
+		// mid 当前引用次数
+		for _, x := range citations {
+			if x >= mid {
+				cnt++
+			}
+		}
+		return cnt >= mid
+	}
+	for left+1 < right {
+		mid := left + ((right - left) >> 1)
+		if check(mid) {
+			left = mid
+		} else {
+			right = mid
+		}
+	}
+	return left
 }
