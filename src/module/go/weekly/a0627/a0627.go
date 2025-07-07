@@ -2,6 +2,7 @@ package a0627
 
 import (
 	"cmp"
+	"container/heap"
 	"fmt"
 	"math"
 	"slices"
@@ -981,4 +982,129 @@ func hIndex(citations []int) int {
 		}
 	}
 	return left
+}
+
+func maximumCandies(candies []int, K int64) int {
+	k := int(K)
+	sum := 0
+	mx := math.MinInt
+	for _, x := range candies {
+		sum += x
+		mx = max(mx, x)
+	}
+	// 如果每个孩子一个糖果都分不到的话
+	if sum < k {
+		return -1
+	}
+	left, right := -1, mx
+	check := func(mid int) bool {
+		// 每个小孩可以分到多少个糖果
+		cnt := 0
+		// mid 当前引用次数
+		for _, x := range candies {
+			cnt += x / mid
+		}
+		return cnt >= k
+	}
+	for left+1 < right {
+		mid := left + ((right - left) >> 1)
+		if check(mid) {
+			left = mid
+		} else {
+			right = mid
+		}
+	}
+	return left
+}
+func maximumLength(s string) (ans int) {
+	groups := [26][]int{}
+	n := len(s)
+	cnt := 0
+	for i, ch := range s {
+		cnt++
+		if i == n-1 || ch != rune(s[i+1]) {
+			groups[ch-'a'] = append(groups[ch-'a'], cnt)
+			cnt = 0
+		}
+	}
+	for _, a := range groups {
+		if len(a) == 0 {
+			continue
+		}
+		// 从大到小进行排序
+		slices.SortFunc(a, func(x, y int) int { return y - x })
+		// 哨兵节点
+		a = append(a, 0, 0)
+		ans = max(ans, a[0]-2, min(a[0]-1, a[1]), a[2])
+	}
+	if ans == 0 {
+		return -1
+	}
+	return ans
+}
+
+func maxNumOfMarkedIndices222(nums []int) int {
+	slices.Sort(nums)
+	n := len(nums)
+	left, right := 0, n/2+1
+	check := func(mid int) bool {
+		for i := range mid {
+			if 2*nums[i] > nums[n-mid+i] {
+				return false
+			}
+		}
+		return true
+	}
+	for left+1 < right {
+		mid := left + ((right - left) >> 1)
+		if check(mid) {
+			left = mid
+		} else {
+			right = mid
+		}
+	}
+	return left * 2
+}
+func maxNumOfMarkedIndices(nums []int) int {
+	slices.Sort(nums)
+	n := len(nums)
+	i := 0
+	for _, x := range nums[(n+1)/2:] {
+		if nums[i]*2 < x {
+			i++
+		}
+	}
+	return i * 2
+}
+
+func furthestBuilding(heights []int, bricks int, ladders int) int {
+	h := hp{}
+	for i := 1; i < len(heights); i++ {
+		diff := heights[i] - heights[i-1]
+		if diff > 0 {
+			heap.Push(&h, diff)
+			bricks -= diff
+			if bricks < 0 {
+				if ladders > 0 {
+					ladders--
+					top := heap.Pop(&h).(int)
+					bricks += top
+				} else {
+					return i - 1
+				}
+			}
+		}
+	}
+	return len(heights) - 1
+}
+
+// 堆模板 Int 数组
+type hp struct{ sort.IntSlice }
+
+func (h *hp) Push(v interface{}) { h.IntSlice = append(h.IntSlice, v.(int)) }
+func (h *hp) Pop() interface{} {
+  a := h.IntSlice
+  v := a[len(a)-1]
+  h.IntSlice = a[:len(a)-1]
+  return v
 }

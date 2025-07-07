@@ -1326,7 +1326,7 @@ func closestNodes222(root *TreeNode, queries []int) [][]int {
 	return ans
 }
 
-func closestNodes(root *TreeNode, queries []int) [][]int {
+func closestNodes555(root *TreeNode, queries []int) [][]int {
 	nums := []int{}
 	var dfs func(*TreeNode)
 	dfs = func(node *TreeNode) {
@@ -1351,6 +1351,37 @@ func closestNodes(root *TreeNode, queries []int) [][]int {
 			j--
 		}
 		if j > 0 {
+			mn = nums[j]
+		}
+		ans[i] = []int{mn, mx}
+	}
+	return ans
+}
+
+func closestNodes(root *TreeNode, queries []int) [][]int {
+	nums := []int{}
+	var dfs func(*TreeNode)
+	dfs = func(node *TreeNode) {
+		if node == nil {
+			return
+		}
+		dfs(node.Left)
+		nums = append(nums, node.Val)
+		dfs(node.Right)
+	}
+	dfs(root)
+	n, m := len(nums), len(queries)
+	ans := make([][]int, m)
+	for i, q := range queries {
+		j, ok := slices.BinarySearch(nums, q)
+		mn, mx := -1, -1
+		if j < n {
+			mx = nums[j]
+		}
+		if !ok {
+			j--
+		}
+		if j >= 0 {
 			mn = nums[j]
 		}
 		ans[i] = []int{mn, mx}
