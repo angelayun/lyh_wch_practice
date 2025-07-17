@@ -903,7 +903,7 @@ func lowestCommonAncestor2(root, p, q *TreeNode) *TreeNode {
 	}
 	return root
 }
-func pathSum(root *TreeNode, targetSum int) (ans int) {
+func pathSum111(root *TreeNode, targetSum int) (ans int) {
 	cnt := map[int]int{0: 1}
 	var dfs func(*TreeNode, int)
 	dfs = func(node *TreeNode, sum int) {
@@ -1387,4 +1387,62 @@ func closestNodes(root *TreeNode, queries []int) [][]int {
 		ans[i] = []int{mn, mx}
 	}
 	return ans
+}
+
+func pathSum332(root *TreeNode, targetSum int) (ans int) {
+	cnt := map[int]int{0: 1}
+	var dfs func(*TreeNode, int)
+	dfs = func(node *TreeNode, sum int) {
+		if node == nil {
+			return
+		}
+		sum += node.Val
+		ans += cnt[sum-targetSum]
+		cnt[sum]++
+		dfs(node.Left, sum)
+		dfs(node.Right, sum)
+	}
+	dfs(root, 0)
+	return
+}
+
+func beautifulSubarrays(nums []int) int64 {
+	ans := 0
+	cnt := map[int]int{0: 1}
+	preSum := 0
+	for _, x := range nums {
+		preSum ^= x
+		ans += cnt[preSum]
+		cnt[preSum]++
+	}
+	return int64(ans)
+}
+func countTriplets(arr []int) (ans int) {
+	for i := range arr {
+		xor := 0
+		for j := i; j < len(arr); j++ {
+			xor ^= arr[j]
+			if xor == 0 {
+				ans += j - i
+			}
+		}
+	}
+	return
+}
+func pathSum(root *TreeNode, targetSum int) (ans int) {
+	cnt := map[int]int{0: 1}
+	var dfs func(*TreeNode, int)
+	dfs = func(node *TreeNode, preSum int) {
+		if node == nil {
+			return
+		}
+		preSum += node.Val
+		ans += cnt[preSum-targetSum]
+		cnt[preSum]++
+		dfs(node.Left, preSum)
+		dfs(node.Right, preSum)
+		cnt[preSum]--
+	}
+	dfs(root, 0)
+	return
 }
