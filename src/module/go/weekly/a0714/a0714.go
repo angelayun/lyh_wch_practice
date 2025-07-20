@@ -800,3 +800,276 @@ func predictPartyVictory(senate string) string {
 		return "Dire"
 	}
 }
+
+func getSubarrayBeauty(nums []int, k int, x int) []int {
+	const BASE = 50
+	// 数据范围小 用数组当map
+	cnt := [BASE*2 + 1]int{}
+	n := len(nums)
+	ans := make([]int, n-k+1)
+	for right, num := range nums {
+		cnt[num+BASE]++
+		if right < k-1 {
+			continue
+		}
+		// x为第几小
+		d := x
+		for i, c := range cnt[:BASE] {
+			if d <= c {
+				ans[right-k+1] = i - BASE
+				break
+			}
+			d -= c
+		}
+		cnt[nums[right-k+1]+BASE]--
+	}
+	return ans
+}
+func mergeSort(arr []int, diff int) int64 {
+	if len(arr) <= 1 {
+		return 0
+	}
+	mid := len(arr) >> 1
+	// 这里必须得复制
+	a := make([]int, mid)
+	b := make([]int, len(arr)-mid)
+	copy(a, arr[:mid])
+	copy(b, arr[mid:])
+	cnt := mergeSort(a, diff) + mergeSort(b, diff)
+	i, n := 0, len(a)
+	for _, x := range b {
+		for i < n && a[i] <= x+diff {
+			i++
+		}
+		cnt += int64(i)
+	}
+	i, j, cur, m := 0, 0, 0, len(b)
+	for i < n || j < m {
+		if i == n {
+			arr = append(arr, b[j:]...)
+		} else if j == m {
+			arr = append(arr, a[i:]...)
+		} else if a[i] < b[j] {
+			arr[cur] = a[i]
+			cur++
+			i++
+		} else {
+			arr[cur] = b[j]
+			cur++
+			j++
+		}
+	}
+	return cnt
+}
+func numberOfPairs(nums1 []int, nums2 []int, diff int) int64 {
+	a := make([]int, len(nums1))
+	for i := range nums1 {
+		a[i] = nums1[i] - nums2[i]
+	}
+	return mergeSort(a, diff)
+}
+
+func eraseOverlapIntervals(intervals [][]int) int {
+	// 按照右端点从小到大排序
+	slices.SortFunc(intervals, func(a, b []int) int { return a[1] - b[1] })
+	fmt.Println(intervals)
+	preR := math.MinInt
+	cnt := 0
+	for _, item := range intervals {
+		if item[1] >= preR {
+			cnt++
+			preR = item[1]
+		}
+	}
+	return len(intervals) - cnt
+}
+
+func findLongestChain(pairs [][]int) (cnt int) {
+	// 按照右端点从小到大排序
+	slices.SortFunc(pairs, func(a, b []int) int { return a[1] - b[1] })
+	preR := math.MinInt
+	for _, item := range pairs {
+		// 当前左端点比上一次右端点要大
+		if item[0] > preR {
+			cnt++
+			preR = item[1]
+		}
+	}
+	return
+}
+
+func maxNumOfSubstrings1(s string) (ans []string) {
+	type pair struct{ left, right int }
+	cnt := map[rune]pair{}
+	for i, ch := range s {
+		// cnt[ch-'a'] = i
+		if item, ok := cnt[ch]; ok {
+			item.right = i
+			cnt[ch] = item
+		} else {
+			cnt[ch] = pair{left: i, right: i}
+		}
+	}
+	arr := [26][]int{}
+	for key, v := range cnt {
+		arr[key-'a'] = []int{v.left, v.right}
+	}
+	// 过滤 nil 切片
+	filtered := make([][]int, 0, len(arr))
+	for _, v := range arr {
+		if v != nil {
+			filtered = append(filtered, v)
+		}
+	}
+	// 按照右端点从小到大排序
+	slices.SortFunc(filtered[:], func(a, b []int) int { return a[1] - b[1] })
+	preR := math.MinInt
+
+	for _, item := range filtered {
+		// 当前左端点比上一次右端点要大
+		if item[0] > preR {
+			l, r := item[0], item[1]
+			ans = append(ans, s[l:r+1])
+			fmt.Println(item)
+			preR = item[1]
+		}
+	}
+	// 使用 slices.SortFunc 按字符串长度排序
+	slices.SortFunc(ans, func(a, b string) int {
+		return len(a) - len(b)
+	})
+	return
+}
+
+func maxNumOfSubstrings222(s string) (ans []string) {
+	// 记录每种字母的出现位置
+	pos := [26][]int{}
+	for i, b := range s {
+		b -= 'a'
+		pos[b] = append(pos[b], i)
+	}
+
+	// 构建有向图
+	g := [26][]int{}
+	for i, p := range pos {
+		if p == nil {
+			continue
+		}
+		l, r := p[0], p[len(p)-1]
+		for j, q := range pos {
+			if j == i {
+				continue
+			}
+			k := sort.SearchInts(q, l)
+			// [l,r] 包含第 j 个小写字母
+			if k < len(q) && q[k] <= r {
+				g[i] = append(g[i], j)
+			}
+		}
+	}
+
+	// 遍历有向图
+	vis := [26]bool{}
+	var l, r int
+	var dfs func(int)
+	dfs = func(x int) {
+		vis[x] = true
+		p := pos[x]
+		l = min(l, p[0]) // 合并区间
+		r = max(r, p[len(p)-1])
+		for _, y := range g[x] {
+			if !vis[y] {
+				dfs(y)
+			}
+		}
+	}
+
+	type pair struct{ l, r int }
+	intervals := []pair{}
+	for i, p := range pos {
+		if p == nil {
+			continue
+		}
+		// 如果要包含第 i 个小写字母，最终得到的区间是什么？
+		vis = [26]bool{}
+		l, r = len(s), 0
+		dfs(i)
+		intervals = append(intervals, pair{l, r})
+	}
+
+	// 435. 无重叠区间
+	// 直接计算最多能选多少个区间
+	slices.SortFunc(intervals, func(a, b pair) int { return a.r - b.r })
+	preR := -1
+	for _, p := range intervals {
+		if p.l > preR {
+			ans = append(ans, s[p.l:p.r+1])
+			preR = p.r
+		}
+	}
+	return
+}
+
+func maxNumOfSubstrings(s string) (ans []string) {
+	// 记录每种字母的出现位置
+	pos := [26][]int{}
+	for i, b := range s {
+		b -= 'a'
+		pos[b] = append(pos[b], i)
+	}
+	// 构建有向图
+	g := [26][]int{}
+	for i, p := range pos {
+		if p == nil {
+			continue
+		}
+		l, r := p[0], p[len(p)-1]
+		// 这是一个双重循环
+		for j, q := range pos {
+			if j == i {
+				continue
+			}
+			k := sort.SearchInts(q, l)
+			if k < len(q) && q[k] <= r {
+				g[i] = append(g[i], j)
+			}
+		}
+	}
+	// 遍历有向图
+	vis := [26]bool{}
+	var l, r int
+	var dfs func(int)
+	dfs = func(x int) {
+		vis[x] = true
+		p := pos[x]
+		l = min(l, p[0])
+		r = max(r, p[len(p)-1])
+		for _, y := range g[x] {
+			if !vis[y] {
+				dfs(y)
+			}
+		}
+	}
+	type pair struct{ l, r int }
+	intervals := []pair{}
+	for i, p := range pos {
+		if p == nil {
+			continue
+		}
+		vis = [26]bool{}
+		l, r = len(s), 0
+		dfs(i)
+		intervals = append(intervals, pair{l, r})
+	}
+	// 按照右端点从小到大排序
+	slices.SortFunc(intervals, func(a, b pair) int { return a.r - b.r })
+	preR := math.MinInt
+	for _, item := range intervals {
+		// 当前左端点比上一次右端点要大
+		if item.l > preR {
+			ans = append(ans, s[item.l:item.r+1])
+			preR = item.r
+		}
+	}
+	return
+}
