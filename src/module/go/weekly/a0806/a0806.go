@@ -235,7 +235,7 @@ func numTriplets(nums1 []int, nums2 []int) int {
 	}
 	return fn(nums1, nums2) + fn(nums2, nums1)
 }
-func threeSumMulti(arr []int, target int) (ans int) {
+func threeSumMulti333(arr []int, target int) (ans int) {
 	slices.Sort(arr)
 	n := len(arr)
 	const mod = 1e9 + 7
@@ -954,4 +954,38 @@ func minimumAddedInteger(nums1 []int, nums2 []int) int {
 		}
 	}
 	return -1
+}
+
+func threeSumMulti(arr []int, target int) (ans int) {
+	slices.Sort(arr)
+	n := len(arr)
+	const mod = 1e9 + 7
+	for i, x := range arr[:n-2] {
+		v := target - x
+		left, right := i+1, n-1
+		for left < right {
+			sum := arr[left] + arr[right]
+			if sum == v {
+				if arr[left] == arr[right] {
+					cnt := right - left + 1
+					ans = (ans + cnt*(cnt-1)/2) % mod
+					break
+				} else {
+					leftCnt, rightCnt := 1, 1
+					for left++; left < right && arr[left-1] == arr[left]; left++ {
+						leftCnt++
+					}
+					for right--; right > left && arr[right+1] == arr[right]; right-- {
+						rightCnt++
+					}
+					ans = (ans + leftCnt*rightCnt) % mod
+				}
+			} else if sum < v {
+				left++
+			} else {
+				right--
+			}
+		}
+	}
+	return
 }

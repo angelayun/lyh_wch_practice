@@ -255,3 +255,32 @@ func Test_camelMatch(t *testing.T) {
 		})
 	}
 }
+
+func Test_threeSumMulti(t *testing.T) {
+	type args struct {
+		arr    []int
+		target int
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantAns int
+	}{
+		// TODO: Add test cases.
+		{
+			name: "111",
+			args: args{
+				arr:    []int{1, 1, 2, 2, 3, 3, 4, 4, 5, 5},
+				target: 8,
+			},
+			wantAns: 20,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotAns := threeSumMulti(tt.args.arr, tt.args.target); gotAns != tt.wantAns {
+				t.Errorf("threeSumMulti() = %v, want %v", gotAns, tt.wantAns)
+			}
+		})
+	}
+}
