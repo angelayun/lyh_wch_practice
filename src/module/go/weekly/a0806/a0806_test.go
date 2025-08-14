@@ -284,3 +284,37 @@ func Test_threeSumMulti(t *testing.T) {
 		})
 	}
 }
+
+func Test_minSwaps(t *testing.T) {
+	type args struct {
+		nums []int
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		// TODO: Add test cases.
+		/* {
+			name: "111",
+			args: args{
+				nums: []int{0, 1, 0, 1, 1, 0, 0},
+			},
+			want: 1,
+		}, */
+		{
+			name: "222",
+			args: args{
+				nums: []int{0, 0, 0},
+			},
+			want: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := minSwaps(tt.args.nums); got != tt.want {
+				t.Errorf("minSwaps() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

@@ -176,9 +176,9 @@ func triangleNumber(nums []int) (ans int) {
 }
 
 func numTriplets22(nums1 []int, nums2 []int) (ans int) {
-	cnt1 := map[int]int{}
+	winLen := map[int]int{}
 	for _, x := range nums1 {
-		cnt1[x*x]++
+		winLen[x*x]++
 	}
 	cnt2 := map[int]int{}
 	for _, x := range nums2 {
@@ -191,7 +191,7 @@ func numTriplets22(nums1 []int, nums2 []int) (ans int) {
 	}
 	for i, x := range nums1 {
 		for _, v := range nums1[i:] {
-			ans += cnt1[x*v]
+			ans += winLen[x*v]
 		}
 	}
 	return
@@ -988,4 +988,91 @@ func threeSumMulti(arr []int, target int) (ans int) {
 		}
 	}
 	return
+}
+
+func minSwaps(nums []int) int {
+	// 先统计1的个数
+	// 定长为k个数的窗口中1的数量最大
+	winLen := 0
+	for _, v := range nums {
+		winLen += v
+	}
+	if winLen == 0 {
+		return 0
+	}
+	// println("1的个数是", winLen)
+	n := len(nums)
+
+	winCnt0 := 0
+	// 定长窗口中0的最小个数
+	minCnt0 := math.MaxInt
+	for i := 0; i < n*2; i++ {
+		x := nums[i%n] ^ 1
+		winCnt0 += x
+		if i < winLen-1 {
+			continue
+		}
+		minCnt0 = min(minCnt0, winCnt0)
+		winCnt0 -= nums[(i-winLen+1)%n] ^ 1
+	}
+	return minCnt0
+}
+
+func maxFreq(s string, maxLetters int, minSize int, maxSize int) (res int) {
+	cnt := map[rune]int{}
+	winKinds := 0
+	ans := map[string]int{}
+	for i, ch := range s {
+		if cnt[ch] == 0 {
+			winKinds++
+		}
+		cnt[ch]++
+		if i < minSize-1 {
+			continue
+		}
+		if winKinds <= maxLetters {
+			ans[s[i-minSize+1:i+1]]++
+		}
+		out := rune(s[i-minSize+1])
+		cnt[out]--
+
+		if cnt[out] == 0 {
+			winKinds--
+		}
+	}
+	for _, cnt := range ans {
+		res = max(res, cnt)
+	}
+	return
+}
+
+func minFlips(s string) int {
+	n := len(s)
+	ans := n
+	cnt := 0
+	for i := range n*2 - 1 {
+		cnt += int(s[i%n]&1) ^ (i & 1)
+		left := i - n + 1
+		// if i < n-1 {
+		if left < 0 { // 也可以这样写
+			continue
+		}
+		ans = min(ans, cnt, n-cnt)
+		cnt -= int(s[left]&1) ^ (left & 1)
+	}
+	return ans
+}
+
+func lengthOfLongestSubstring(s string) (ans int) {
+  cnt := [128]bool{}
+  left := 0
+  for right, c := range s {
+		for cnt[c] {
+			cnt[s[left]]=false
+      left++
+    }
+		cnt[c]=true
+    ans = max(ans, right-left+1)
+  }
+  return ans
 }
