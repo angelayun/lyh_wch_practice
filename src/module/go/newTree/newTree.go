@@ -2,6 +2,7 @@ package newtree
 
 import (
 	"bytes"
+	"cmp"
 	"fmt"
 	"math"
 	"slices"
@@ -678,7 +679,7 @@ func pruneTree(root *TreeNode) *TreeNode {
 	}
 	return root
 }
-func removeLeafNodes(root *TreeNode, target int) *TreeNode {
+func removeLeafNodes222(root *TreeNode, target int) *TreeNode {
 	if root == nil {
 		return root
 	}
@@ -688,8 +689,8 @@ func removeLeafNodes(root *TreeNode, target int) *TreeNode {
 		}
 		return root
 	}
-	root.Left = removeLeafNodes(root.Left, target)
-	root.Right = removeLeafNodes(root.Right, target)
+	root.Left = removeLeafNodes222(root.Left, target)
+	root.Right = removeLeafNodes222(root.Right, target)
 	if root.Left == root.Right && root.Val == target {
 		return nil
 	}
@@ -1446,3 +1447,339 @@ func pathSum(root *TreeNode, targetSum int) (ans int) {
 	dfs(root, 0)
 	return
 }
+
+func removeLeafNodes(root *TreeNode, target int) *TreeNode {
+	if root == nil {
+		return nil
+	}
+	if root.Left == root.Right && root.Val == target {
+		return nil
+	}
+	root.Left = removeLeafNodes(root.Left, target)
+	root.Right = removeLeafNodes(root.Right, target)
+	if root.Left == root.Right && root.Val == target {
+		return nil
+	}
+	return root
+}
+func clumsy(n int) (ans int) {
+	st := []int{n}
+	op := 0
+	for i := n - 1; i >= 1; i-- {
+		switch op {
+		case 0:
+			top := st[len(st)-1]
+			st = st[:len(st)-1]
+			st = append(st, top*i)
+			break
+		case 1:
+			top := st[len(st)-1]
+			st = st[:len(st)-1]
+			st = append(st, top/i)
+			break
+		case 2:
+			st = append(st, i)
+			break
+		case 3:
+			st = append(st, -i)
+			break
+		}
+		op = (op + 1) % 4
+	}
+	for _, x := range st {
+		ans += x
+	}
+	return
+}
+func getDescentPeriods(prices []int) int64 {
+	n := len(prices)
+	ans := 0
+	for i := 0; i < n; {
+		i0 := i
+		for i++; i < n && prices[i-1]-prices[i] == 1; i++ {
+
+		}
+		cnt := i - i0
+		ans += (1 + cnt) * cnt / 2
+		// 1+2+3+4= (1+4)*4/2
+	}
+	return int64(ans)
+}
+func sumOddLengthSubarrays(arr []int) int {
+	n := len(arr)
+	preSum := make([]int, n+1)
+	for i, x := range arr {
+		preSum[i+1] = preSum[i] + x
+	}
+	ans := 0
+	for i := 0; i < n; i++ {
+		// i表示数组的左端点
+		for l := 1; i+l-1 < n; l += 2 {
+			ans += preSum[i+l] - preSum[i]
+		}
+	}
+	return ans
+}
+func minDeletion(s string, k int) (ans int) {
+	cnt := [26]int{}
+	for _, ch := range s {
+		cnt[ch-'a']++
+	}
+	slices.SortFunc(cnt[:], func(a, b int) int { return b - a })
+	for i := k; i < 26; i++ {
+		ans += cnt[i]
+		if cnt[i] == 0 {
+			break
+		}
+	}
+	return
+}
+func canPartitionGrid1(grid [][]int) bool {
+	m, n := len(grid), len(grid[0])
+	totalSum := 0
+	for _, rows := range grid {
+		for _, col := range rows {
+			totalSum += col
+		}
+	}
+	if totalSum%2 == 1 {
+		return false
+	}
+	halfSum := 0
+	for i := 1; i < m; i++ {
+		for j := 0; j < n; j++ {
+			halfSum += grid[i-1][j]
+		}
+		if halfSum == totalSum/2 {
+			return true
+		}
+	}
+	halfSum = 0
+	for j := 1; j < n; j++ {
+		for i := 0; i < m; i++ {
+			halfSum += grid[i][j-1]
+		}
+		if halfSum == totalSum/2 {
+			return true
+		}
+	}
+	return false
+}
+
+func maxScore(n int, edges [][]int) int64 {
+	type pair struct{ i, cnt, idx int }
+	deg := make([]pair, n)
+	for i := range deg {
+		deg[i] = pair{i, 0, -1}
+	}
+	for _, e := range edges {
+		x, y := e[0], e[1]
+		deg[x].cnt++
+		deg[y].cnt++
+	}
+	idx := n
+	slices.SortFunc(deg, func(x, y pair) int {
+		return cmp.Or(cmp.Compare(y.cnt, x.cnt), cmp.Compare(y.i, x.i))
+	})
+	for _, item := range deg {
+		deg[item.i].idx = idx
+		idx--
+	}
+	ans := 0
+	for _, e := range edges {
+		x, y := e[0], e[1]
+		ans += deg[x].idx * deg[y].idx
+	}
+	return int64(ans)
+}
+
+func canPartitionGrid(grid [][]int) bool {
+	totalSum := 0
+	for _, rows := range grid {
+		for _, col := range rows {
+			totalSum += col
+		}
+	}
+	check := func(a [][]int) bool {
+		m, n := len(grid), len(grid[0])
+		f := func() bool {
+			has := map[int]bool{0: true}
+			s := 0
+			for i, rows := range a[:m-1] {
+				for j, x := range rows {
+					s += x
+					if i > 0 || j == 0 || j == n-1 {
+						has[x] = true
+					}
+				}
+				if n == 1 {
+					if s*2 == totalSum || s*2-totalSum == a[0][0] || s*2-totalSum == rows[0] {
+						return true
+					}
+					continue
+				}
+				if has[s*2-totalSum] {
+					return true
+				}
+				if i == 0 {
+					for _, x := range rows {
+						has[x] = true
+					}
+				}
+			}
+			return false
+		}
+		if f() {
+			return true
+		}
+		slices.Reverse(a)
+		return f()
+	}
+	return check(grid) || check(rotate(grid))
+}
+func rotate(a [][]int) [][]int {
+	m, n := len(a), len(a[0])
+	b := make([][]int, n)
+	for i := range b {
+		b[i] = make([]int, m)
+	}
+	for i, rows := range a {
+		for j, col := range rows {
+			b[j][m-1-i] = col
+		}
+	}
+	return b
+}
+
+func minimumPossibleSum(n int, target int) int {
+	// ans:=make([]int,n)
+	ans := []int{target}
+	mn := 1
+	for len(ans) < n {
+		ans = append(ans, mn)
+		mn++
+
+		if len(ans) < n {
+			ans = append(ans, target+1)
+			target++
+		}
+	}
+	const mod = 1e9 + 7
+	res := 0
+	for _, x := range ans {
+		res = (res + x) % mod
+	}
+	return res
+}
+
+func minNumberOfHours(eng int, exp int, energy []int, experience []int) (ans int) {
+	for i, e := range energy {
+		if eng <= e {
+			ans += e + 1 - eng
+			eng = e + 1
+		}
+		eng -= e
+		e = experience[i]
+		if exp <= e {
+			ans += e + 1 - exp
+			exp = e + 1
+		}
+		exp += e
+	}
+	return ans
+}
+
+func canMakeSubsequence(str1 string, str2 string) bool {
+	m := len(str2)
+	j := 0
+	for _, ch := range str1 {
+		if j < m && str2[j] == byte(ch) || (str2[j]-'a')%26 == (byte(ch)-'a'+1)%26 {
+			j++
+		}
+	}
+	return j == m
+}
+
+func maxSum(grid [][]int, limits []int, k int) int64 {
+	res := []int{}
+	for i, rows := range grid {
+		slices.SortFunc(rows, func(x, y int) int { return y - x })
+		res = append(res, rows[:limits[i]]...)
+	}
+	slices.SortFunc(res, func(x, y int) int { return y - x })
+	ans := 0
+	for _, x := range res[:max(k, len(res))] {
+		ans += x
+	}
+	return int64(ans)
+}
+
+func partitionArray222(nums []int, k int) (ans int) {
+	n := len(nums)
+	slices.Sort(nums)
+	if k == 0 {
+		return len(slices.Compact(nums))
+	}
+	prev := nums[0]
+
+	for i, x := range nums[1:] {
+		if i == n-2 || x-prev > k {
+			ans++
+			prev = x
+		}
+	}
+	return ans
+}
+
+func partitionArray(nums []int, k int) (ans int) {
+	slices.Sort(nums)
+	prev := math.MaxInt / 2
+	for _, x := range nums {
+		if x-prev > k {
+			prev = x
+			ans++
+		}
+	}
+	return
+}
+
+func decrypt222(code []int, k int) []int {
+	// 左闭右开区间
+	n := len(code)
+	r := k + 1
+	if k < 0 {
+		k = -k
+		r = n
+	}
+	sum := 0
+	for i := r - k; i < r; i++ {
+		sum += code[i%n]
+	}
+	ans := make([]int, n)
+	for i, x := range code {
+		ans[i] = sum
+		sum += x - code[(i-k)%n]
+	}
+	return ans
+}
+
+func decrypt(code []int, k int) []int {
+	n := len(code)
+	r := k
+	if k < 0 {
+		k = -k
+		r = n
+	}
+	sum := 0
+	for i := r - k; i < r; i++ {
+		sum += code[i]
+	}
+	ans := make([]int, n)
+	for i := range code {
+		ans[i] = sum
+		sum += code[(r+i)%n] - code[(r+i-k)%n]
+	}
+	return ans
+}
+
+

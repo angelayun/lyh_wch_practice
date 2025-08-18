@@ -2,10 +2,13 @@ package a0813
 
 import (
 	"cmp"
+	"container/heap"
 	"fmt"
+	"math"
 	"slices"
+	"sort"
 	"strconv"
-	"unicode"
+	"strings"
 )
 
 const mx = 1e5 + 1
@@ -362,60 +365,278 @@ func minSwaps(nums []int) int {
 	return n - uf.cc
 }
 
-func minMoves(matrix []string) int {
-	m, n := len(matrix), len(matrix[0])
-	if matrix[m-1][n-1] == '#' {
-		return -1
+func minMoves(target int, maxDoubles int) (ans int) {
+	if maxDoubles == 0 {
+		return target - 1
 	}
-	type pair struct{ x, y int }
-	pos := ['Z' + 1][]pair{}
-	for i, rows := range matrix {
-		for j, col := range rows {
-			if unicode.IsUpper(col) {
-				pos[col] = append(pos[col], pair{i, j})
+	if target == 1 {
+		return 0
+	}
+	for target > 1 {
+		if target&1 == 1 {
+			target--
+		} else if maxDoubles > 0 {
+			target /= 2
+			maxDoubles--
+		} else {
+			target--
+		}
+		ans++
+	}
+	return
+}
+
+func maxSatisfied(customers []int, grumpy []int, minutes int) int {
+	cnt := [2]int{}
+	maxS1 := 0
+	for i, x := range customers {
+		cnt[grumpy[i]] += x
+		if i < minutes-1 {
+			continue
+		}
+		maxS1 = max(maxS1, cnt[1])
+		if grumpy[i] == 1 {
+			cnt[grumpy[i]] -= customers[i-minutes+1]
+		}
+	}
+	return cnt[0] + maxS1
+}
+
+func minStoneSum(piles []int, k int) (ans int) {
+	h := hp{piles}
+	heap.Init(&h)
+	for k > 0 {
+		k--
+		top := heap.Pop(&h).(int)
+		top -= top / 2
+		if top > 0 {
+			heap.Push(&h, top)
+		}
+	}
+	for h.Len() > 0 {
+		ans += heap.Pop(&h).(int)
+	}
+	return
+}
+
+type hp struct{ sort.IntSlice }
+
+// 从大到小
+func (h hp) Less(i, j int) bool  { return h.IntSlice[i] > h.IntSlice[j] }
+func (h *hp) Push(v interface{}) { h.IntSlice = append(h.IntSlice, v.(int)) }
+func (h *hp) Pop() interface{} {
+	a := h.IntSlice
+	v := a[len(a)-1]
+	h.IntSlice = a[:len(a)-1]
+	return v
+}
+func maximum69Number22(num int) int {
+	v := strconv.Itoa(num)
+	v = strings.Replace(v, "6", "9", 1)
+	res, _ := strconv.Atoi(v)
+	return res
+}
+
+func maximum69Number(num int) int {
+	maxBase := 0
+	base := 1
+	for v := num; v > 0; v /= 10 {
+		x := v % 10
+		if x == '6' {
+			maxBase = base
+		}
+		base *= 10
+	}
+	return num + (maxBase * 3)
+}
+
+func edgeScore222(edges []int) (ans int) {
+	n := len(edges)
+	deg := make([]int, n)
+	for i, pa := range edges {
+		deg[pa] += i
+	}
+	mx := math.MinInt
+	for i, d := range deg {
+		if d > mx {
+			mx = d
+			ans = i
+		}
+	}
+	return
+}
+
+func edgeScore(edges []int) (ans int) {
+	n := len(edges)
+	deg := make([]int, n)
+	mx := math.MinInt
+	for i, pa := range edges {
+		deg[pa] += i
+		if deg[pa] > mx {
+			mx = deg[pa]
+			ans = pa
+		}
+	}
+	return
+}
+
+func longestAlternatingSubarray(nums []int, threshold int) (ans int) {
+	n := len(nums)
+	for i := 0; i < n; {
+		if nums[i]%2 != 0 || nums[i] > threshold {
+			i++
+			continue
+		}
+		i0 := 0
+		for i++; i < n && nums[i-1]%2 != nums[i]%2 && nums[i] <= threshold; i++ {
+		}
+		cnt := i - i0
+		ans = max(ans, cnt-1)
+	}
+	return
+}
+
+func numMovesStones(a int, b int, c int) []int {
+	arr := []int{a, b, c}
+	slices.Sort(arr)
+	if arr[0]+1 == arr[1] && arr[1]+1 == arr[2] {
+		return []int{0, 0}
+	}
+	leftMin, leftMax := 0, 0
+	if arr[0]+1 != arr[1] {
+		leftMin = 1
+		leftMax = arr[1] - arr[0] - 1
+	}
+	rightMin, rightMax := 0, 0
+	if arr[1]+1 != arr[2] {
+		rightMin = 1
+		rightMax = arr[2] - arr[1] - 1
+	}
+	if arr[0]+2 == arr[1] || arr[1]+2 == arr[2] {
+		return []int{1, rightMax}
+	}
+	return []int{leftMin + rightMin, leftMax + rightMax}
+}
+
+func checkArithmeticSubarrays(nums []int, l []int, r []int) []bool {
+	m := len(l)
+	ans := make([]bool, m)
+	isDiff := func(a []int) bool {
+		slices.Sort(a)
+		if len(a) < 2 {
+			return false
+		}
+		diff := a[1] - a[0]
+		for i := 2; i < len(a); i++ {
+			if a[i]-a[i-1] != diff {
+				return false
 			}
 		}
+		return true
 	}
-	var dir4 = []pair{{-1, 0}, {1, 0}, {0, -1}, {0, 1}}
-	dis := make([][]int, m)
-	for i := range dis {
-		dis[i] = make([]int, n)
-		for j := range dis[i] {
-			dis[i][j] = -1
-		}
+	for i, lp := range l {
+		rp := r[i]
+		// tmp := slices.Clone(nums[lp : rp+1])
+		ans[i] = isDiff(nums[lp : rp+1])
+
 	}
-	// 从左上角出发
-	dis[0][0] = 0
-	q0 := []pair{}
-	q1 := []pair{}
-	for len(q0) > 0 || len(q1) > 0 {
-		var q pair
-		if len(q0) > 0 {
-			q, q0 = q0[len(q0)-1], q0[:len(q0)-1]
-		} else if len(q1) > 0 {
-			q, q1 = q1[0], q1[1:]
-		}
-		d := dis[q.x][q.y]
-		if q.x == m-1 && q.y == n-1 {
-			return d
-		}
-		if c := matrix[q.x][q.y]; c != '.' {
-			for _, p := range pos[c] {
-				x, y := p.x, p.y
-				if d < dis[x][y] {
-					dis[x][y] = d
-					q0 = append(q0, pair{x, y})
-				}
-			}
-			pos[c] = nil
-		}
-		for _, dir := range dir4 {
-			x, y := q.x+dir.x, q.y+dir.y
-			if x >= 0 && x < m && y >= 0 && y < n && matrix[x][y] != '#' && d+1 < dis[x][y] {
-				dis[x][y] = d + 1
-				q1 = append(q1, pair{x, y})
-			}
+	return ans
+}
+
+func maximumCostSubstring(s string, chars string, vals []int) (ans int) {
+	cnt := [26]int{}
+	for i := range cnt {
+		cnt[i] = i + 1
+	}
+	for i, ch := range chars {
+		idx := ch - 'a'
+		cnt[idx] = vals[i]
+	}
+	f0 := 0
+	ans = f0
+	for i := 0; i < len(s); i++ {
+		f0 = max(f0, 0) + cnt[s[i]-'a']
+		ans = max(ans, f0)
+	}
+	return
+}
+func minimumSteps(s string) int64 {
+	cnt1 := 0
+	ans := 0
+	for _, ch := range s {
+		if ch == '1' {
+			cnt1++
+		} else {
+			ans += cnt1
 		}
 	}
-	return -1
+	return int64(ans)
+}
+
+func longestSubarray(nums []int) (ans int) {
+	left := 0
+	cnt := [2]int{}
+	for right, x := range nums {
+		cnt[x]++
+		for cnt[0] > 1 {
+			cnt[nums[left]]--
+			left++
+		}
+		ans = max(ans, right-left)
+	}
+	return
+}
+
+func lastNonEmptyString(s string) string {
+	// 出现在哪些下标
+	cnt := [26]int{}
+	last := [26]int{}
+	mx := 0
+	for i, ch := range s {
+		cnt[ch-'a']++
+		last[ch-'a'] = i
+		if cnt[ch-'a'] > mx {
+			mx = cnt[ch-'a']
+		}
+	}
+	ans := []byte{}
+	for i, ch := range s {
+		if cnt[ch-'a'] == mx && i == last[ch-'a'] {
+			ans = append(ans, byte(ch))
+		}
+	}
+	return string(ans)
+}
+
+func filterRestaurants(restaurants [][]int, veganFriendly int, maxPrice int, maxDistance int) []int {
+	type pair struct{ id, rating int }
+	ls := []pair{}
+	for _, r := range restaurants {
+		id, rating, vegan, price, distance := r[0], r[1], r[2], r[3], r[4]
+		if !(vegan == 0 && veganFriendly == 1) && price <= maxPrice && distance <= maxDistance {
+			ls = append(ls, pair{id, rating})
+		}
+	}
+	slices.SortFunc(ls, func(x, y pair) int { return cmp.Or(cmp.Compare(y.rating, x.rating), cmp.Compare(y.id, x.id)) })
+	ans := []int{}
+	for _, item := range ls {
+		ans = append(ans, item.id)
+	}
+	return ans
+}
+
+func isValid(s string) bool {
+	st := []byte{}
+	for _, ch := range s {
+		st = append(st, byte(ch))
+		for len(st) > 2 && st[len(st)-1] == 'c' && st[len(st)-2] == 'b' && st[len(st)-3] == 'a' {
+			st = st[:len(st)-3]
+		}
+	}
+	return len(st) == 0
+}
+
+func perfectPairs(nums []int) int64 {
+	slices.Sort(nums)
+	
 }

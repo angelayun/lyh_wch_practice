@@ -9,6 +9,30 @@ type ListNode struct {
 	Next *ListNode
 }
 
+func spiralMatrix(m int, n int, head *ListNode) [][]int {
+	grid := make([][]int, m)
+	for i := range grid {
+		grid[i] = make([]int, n)
+		for j := range grid[i] {
+			grid[i][j] = -1
+		}
+	}
+	type pair struct{ x, y int }
+	// 右下左上
+	var dir4 = []pair{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
+	for x, y, di := 0, 0, 0; head != nil; head = head.Next {
+		grid[x][y] = head.Val
+		d := dir4[di]
+		if xx, yy := x+d.x, y+d.y; xx < 0 || xx >= m || yy < 0 || y >= n || grid[xx][yy] != -1 {
+			di = (di + 1) % 4
+			d = dir4[di]
+		}
+		x += d.x
+		y += d.y
+	}
+	return grid
+}
+
 // 1290
 func getDecimalValue(head *ListNode) (ans int) {
 	for head != nil {
@@ -195,4 +219,3 @@ func findNumbers(nums []int) (ans int) {
 	}
 	return
 }
-
